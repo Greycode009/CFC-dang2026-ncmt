@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaPlus, FaEye, FaEyeSlash } from "react-icons/fa";
 
 const InstituteRegister = () => {
+  const navigate = useNavigate();
+
   // Form input state
   const [formData, setFormData] = useState({
     instituteName: "",
@@ -32,7 +34,12 @@ const InstituteRegister = () => {
       alert("Passwords do not match!");
       return;
     }
+
+    // TODO: Connect with backend API here (e.g., await axios.post('/api/institute/register', formData))
     console.log("Registering Institute:", formData);
+
+    // Navigate to institute profile
+    navigate("/institute/profile");
   };
 
   return (

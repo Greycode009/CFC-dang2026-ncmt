@@ -1,8 +1,10 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import  { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { FaUserPlus, FaEye, FaEyeSlash } from "react-icons/fa";
 
 const PatientRegister = () => {
+  const navigate = useNavigate();
+
   // Form input state
   const [formData, setFormData] = useState({
     fullName: "",
@@ -32,7 +34,12 @@ const PatientRegister = () => {
       alert("Passwords do not match!");
       return;
     }
+
+    // TODO: Connect with backend API here (e.g., await axios.post('/api/register', formData))
     console.log("Registering Patient:", formData);
+
+    // Navigate to patient profile onboarding
+    navigate("/patient/profile");
   };
 
   return (

@@ -6,6 +6,11 @@ const Navbar = () => {
   // Get current page location/URL path
   const location = useLocation();
 
+  // Hide Navbar completely on profile pages (e.g. /patient/profile, /institute/profile)
+  if (location.pathname.includes("/profile")) {
+    return null;
+  }
+
   // Check if current page is Login
   const isLoginPage = location.pathname === "/login";
 

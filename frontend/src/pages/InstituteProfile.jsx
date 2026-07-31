@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { FaHospital, FaStethoscope, FaClock, FaMapMarkerAlt } from "react-icons/fa";
 import Profile from "../components/Profile";
+import InstituteBasics from "../components/InstituteProfile/InstituteBasics";
+import Services from "../components/InstituteProfile/Services";
+import ContactDetails from "../components/InstituteProfile/ContactDetails";
+import Verification from "../components/InstituteProfile/Verification";
 
 const InstituteProfile = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -55,7 +59,8 @@ const InstituteProfile = () => {
     }
   };
 
-  const getStepConfig = () => {
+  // Render content based on active step
+  const renderStepContent = () => {
     switch (currentStep) {
       case 1:
         return {
@@ -63,161 +68,42 @@ const InstituteProfile = () => {
           subtitle: "Provide basic information about your healthcare facility.",
           cardIcon: <FaHospital className="text-5xl sm:text-6xl text-[#0d9488]" />,
           cardTitle: "Hospital Listing",
-          cardDescription:
-            "Accurate facility details help patients discover your services and book specialized care.",
-          content: (
-            <>
-              <div className="space-y-1.5">
-                <label className="font-sans block text-xs sm:text-sm font-semibold text-slate-800">
-                  Institute Type
-                </label>
-                <select
-                  name="instituteType"
-                  value={formData.instituteType}
-                  onChange={handleChange}
-                  className="font-sans w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#0d9488] bg-white"
-                >
-                  <option value="General Hospital">General Hospital</option>
-                  <option value="Specialized Clinic">Specialized Clinic</option>
-                  <option value="Diagnostic Center">Diagnostic Center</option>
-                  <option value="Nursing Home">Nursing Home</option>
-                </select>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="font-sans block text-xs sm:text-sm font-semibold text-slate-800">
-                  Total Bed Capacity
-                </label>
-                <input
-                  type="number"
-                  name="bedCapacity"
-                  value={formData.bedCapacity}
-                  onChange={handleChange}
-                  placeholder="e.g. 150"
-                  className="font-sans w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#0d9488]"
-                />
-              </div>
-            </>
-          ),
+          cardDescription: "Accurate facility details help patients discover your services and book specialized care.",
+          component: <InstituteBasics formData={formData} handleChange={handleChange} />,
         };
-
       case 2:
         return {
           title: "Departments & Specialties",
           subtitle: "List key medical departments available at your facility.",
           cardIcon: <FaStethoscope className="text-5xl sm:text-6xl text-[#0d9488]" />,
           cardTitle: "Clinical Specialties",
-          cardDescription:
-            "Listing your departments allows AI health consultation to match relevant patients to your doctors.",
-          content: (
-            <>
-              <div className="space-y-1.5">
-                <label className="font-sans block text-xs sm:text-sm font-semibold text-slate-800">
-                  Available Departments
-                </label>
-                <textarea
-                  name="departments"
-                  rows={3}
-                  value={formData.departments}
-                  onChange={handleChange}
-                  placeholder="e.g. Cardiology, Neurology, Pediatrics, ICU"
-                  className="font-sans w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#0d9488]"
-                />
-              </div>
-            </>
-          ),
+          cardDescription: "Listing your departments allows AI health consultation to match relevant patients to your doctors.",
+          component: <Services formData={formData} handleChange={handleChange} />,
         };
-
       case 3:
         return {
           title: "Operating Hours",
           subtitle: "Specify OPD and Emergency care timings.",
           cardIcon: <FaClock className="text-5xl sm:text-6xl text-[#0d9488]" />,
           cardTitle: "Timely Care",
-          cardDescription:
-            "Clear operating hours enable smooth appointment scheduling and emergency triage.",
-          content: (
-            <>
-              <div className="space-y-1.5">
-                <label className="font-sans block text-xs sm:text-sm font-semibold text-slate-800">
-                  OPD Timings
-                </label>
-                <input
-                  type="text"
-                  name="opdHours"
-                  value={formData.opdHours}
-                  onChange={handleChange}
-                  placeholder="08:00 AM - 08:00 PM"
-                  className="font-sans w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#0d9488]"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="font-sans block text-xs sm:text-sm font-semibold text-slate-800">
-                  Emergency Service Availability
-                </label>
-                <select
-                  name="emergencyCare"
-                  value={formData.emergencyCare}
-                  onChange={handleChange}
-                  className="font-sans w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#0d9488] bg-white"
-                >
-                  <option value="24/7 Available">24/7 Available</option>
-                  <option value="Daytime Only">Daytime Only</option>
-                  <option value="On Call">On Call</option>
-                </select>
-              </div>
-            </>
-          ),
+          cardDescription: "Clear operating hours enable smooth appointment scheduling and emergency triage.",
+          component: <ContactDetails formData={formData} handleChange={handleChange} />,
         };
-
       case 4:
         return {
           title: "Location & Address",
           subtitle: "Specify your institute address for location-based hospital search.",
           cardIcon: <FaMapMarkerAlt className="text-5xl sm:text-6xl text-[#0d9488]" />,
           cardTitle: "Geographic Mapping",
-          cardDescription:
-            "Your location is pinned on MedAssist hospital search for nearby patient navigation.",
-          content: (
-            <>
-              <div className="space-y-1.5">
-                <label className="font-sans block text-xs sm:text-sm font-semibold text-slate-800">
-                  Street Address
-                </label>
-                <input
-                  type="text"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  placeholder="Enter street address"
-                  className="font-sans w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#0d9488]"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="font-sans block text-xs sm:text-sm font-semibold text-slate-800">
-                  City / District
-                </label>
-                <input
-                  type="text"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  placeholder="Enter city"
-                  className="font-sans w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#0d9488]"
-                />
-              </div>
-            </>
-          ),
+          cardDescription: "Your location is pinned on MedAssist hospital search for nearby patient navigation.",
+          component: <Verification formData={formData} handleChange={handleChange} />,
         };
-
       default:
         return {};
     }
   };
 
-  const stepConfig = getStepConfig();
+  const stepConfig = renderStepContent();
 
   return (
     <Profile
@@ -234,7 +120,7 @@ const InstituteProfile = () => {
       cardTitle={stepConfig.cardTitle}
       cardDescription={stepConfig.cardDescription}
     >
-      {stepConfig.content}
+      {stepConfig.component}
     </Profile>
   );
 };
