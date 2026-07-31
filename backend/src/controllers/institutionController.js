@@ -1,6 +1,6 @@
 import { where } from "sequelize"
-import Institution from "../models/institutionModel"
-import User from "../models/userModel"
+import Institution from "../models/institutionModel.js"
+import User from "../models/userModel.js"
 
 
 async function getInstitutionProfile(req, res) {
