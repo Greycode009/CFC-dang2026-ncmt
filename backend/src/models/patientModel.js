@@ -10,24 +10,6 @@ const Patient = sequelize.define(
             primaryKey: true,
             allowNull: false
         },
-        fullName: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        email: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true
-        },
-        phoneNumber: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true
-        },
-        password: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
         age: {
             type: DataTypes.INTEGER,
             allowNull: false
@@ -72,6 +54,9 @@ const Patient = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false
         }
+    }, 
+    {
+        timestamps: true
     }
 )
 
