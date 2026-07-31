@@ -21,6 +21,13 @@ const connectDB = async () => {
     }
 }
 
+sequelize.sync({ force: false, alter: false }).then(() => {
+    console.log("All models were synchronized successfully.")
+}).catch((error) => {
+    console.error("Error synchronizing models:", error)
+})
+
 export { 
     sequelize, 
-    connectDB }
+    connectDB 
+}
