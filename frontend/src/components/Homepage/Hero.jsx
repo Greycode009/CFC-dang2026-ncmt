@@ -8,7 +8,7 @@ const Hero = () => {
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
         
         {/* LEFT COLUMN: Text Content & Actions */}
-        <div className="lg:col-span-5 space-y-8">
+        <div className="lg:col-span-5 space-y-8 order-2 lg:order-1">
           
           {/* Status Pill Badge (JetBrains Mono Font) */}
           <div>
@@ -69,7 +69,7 @@ const Hero = () => {
         </div>
 
         {/* RIGHT COLUMN: Hero Image */}
-        <div className="lg:col-span-7 relative flex justify-center items-center">
+        <div className="lg:col-span-7 relative flex justify-center items-center order-1 lg:order-2">
           <img
             src="https://i.ibb.co/XZ7JD9GX/Untitled-design.png"
             alt="Healthcare Made Simpler Illustration"
