@@ -20,14 +20,14 @@ const Login = () => {
   };
 
   return (
-    // Outer Page Background Wrapper (Different background contrast, centered with padding, NO shadow)
-    <div className="min-h-[calc(100vh-73px)] w-full bg-[#e6f4f1] flex items-center justify-center p-4 sm:p-6 lg:p-10">
+    // Outer Page Background Wrapper (Clean human-written Tailwind)
+    <div className="min-h-screen w-full bg-[#e6f4f1] flex items-center justify-center p-4 sm:p-6 lg:p-12">
       
-      {/* Main Centered Login Card Container (Clean border, NO shadow) */}
-      <div className="w-full max-w-5xl bg-white rounded-3xl overflow-hidden flex flex-col lg:flex-row border border-slate-200/80">
+      {/* Main Centered Login Card Container */}
+      <div className="w-full max-w-5xl bg-white rounded-3xl overflow-hidden flex flex-col lg:flex-row border border-slate-200">
         
         {/* LEFT PANEL: Teal Branding Banner */}
-        <div className="lg:w-1/2 bg-[#0d9488] text-white p-8 lg:p-12 flex flex-col justify-center items-center text-center relative overflow-hidden min-h-[380px] lg:min-h-[540px]">
+        <div className="lg:w-1/2 bg-[#0d9488] text-white p-8 lg:p-12 flex flex-col justify-center items-center text-center relative overflow-hidden">
           
           {/* Background Decorative Shapes */}
           <div className="absolute -top-16 -left-16 w-80 h-80 rounded-full border border-white/20 pointer-events-none" />
@@ -36,7 +36,7 @@ const Login = () => {
           <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-white/5 pointer-events-none" />
 
           {/* Branding Content */}
-          <div className="relative z-10 max-w-sm flex flex-col items-center">
+          <div className="relative z-10 max-w-sm flex flex-col items-center py-6 lg:py-12">
             {/* Logo Card */}
             <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-2xl flex items-center justify-center border border-white/30 mb-6">
               <FaPlus className="text-[#0d9488] text-3xl sm:text-4xl" />
@@ -172,5 +172,6 @@ const Login = () => {
 };
 
 export default Login;
+
 
 

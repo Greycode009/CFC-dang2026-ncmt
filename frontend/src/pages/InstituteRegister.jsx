@@ -23,8 +23,9 @@ const InstituteRegister = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-73px)] w-full bg-[#e6f4f1] flex items-center justify-center p-4 sm:p-6 lg:p-10">
-      <div className="w-full max-w-xl bg-white rounded-3xl p-8 sm:p-10 border border-slate-200/80 shadow-xs space-y-6">
+    <div className="min-h-screen w-full bg-[#e6f4f1] flex items-center justify-center p-4 sm:p-6 lg:p-12">
+      <div className="w-full max-w-xl bg-white rounded-3xl p-8 sm:p-10 border border-slate-200 shadow-xs space-y-6">
+
         
         {/* Header */}
         <div className="space-y-1.5 text-center">
