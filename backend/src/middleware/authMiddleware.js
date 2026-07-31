@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken"
 import { envConfig } from "../config/config.js";
+import User from "../models/userModel.js";
 
 async function isAuthenticated(req, res, next) {
     try {
@@ -10,7 +11,17 @@ async function isAuthenticated(req, res, next) {
             });
         }
         const decodedToken = jwt.verify(token, envConfig.jwtSecret);
-        req.user = decodedToken;
+        const user = await User.findByPk(decodedToken.id);
+        if (!user) {
+            return res.status(401).json({
+                message: "User not found"
+            })
+        }
+        req.user = {
+            id: user.id,
+            role: user.role,
+            email: user.email
+        };
         next();
     } catch (error) {
         console.error("Error during authentication:", error);

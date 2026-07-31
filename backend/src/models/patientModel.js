@@ -12,23 +12,23 @@ const Patient = sequelize.define(
         },
         age: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: true
         },
         gender: {
             type: DataTypes.ENUM("Male", "Female", "Other"),
-            allowNull: false
+            allowNull: true
         },
         height: {
             type: DataTypes.FLOAT,
-            allowNull: false
+            allowNull: true
         },
         weight: {
             type: DataTypes.FLOAT,
-            allowNull: false
+            allowNull: true
         },
         bloodGroup: {
             type: DataTypes.ENUM("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"),
-            allowNull: false
+            allowNull: true
         },
         allergies: {
             type: DataTypes.STRING,
@@ -38,21 +38,25 @@ const Patient = sequelize.define(
             type: DataTypes.STRING,
             allowNull: true
         },
-        curretMedications: {
+        currentMedications: {
             type: DataTypes.STRING,
             allowNull: true
         },
         emergencyContactName: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
         emergencyContactNumber: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
         address: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
+        },
+        profileCompleted: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
         }
     }, 
     {

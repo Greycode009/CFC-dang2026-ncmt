@@ -1,3 +1,4 @@
+import Patient from "../models/patientModel.js"
 import User from "../models/userModel.js"
 
 
@@ -6,8 +7,9 @@ async function getPatientProfile(req, res) {
     try {
         const patientId = req.user.id
 
-        const patient = await User.findByPk(patientId)
-        
+        const patient = await User.findByPk(patientId, {
+            include: Patient
+        })
 
         if (!patient) {
             return res.status(404).json({
@@ -57,10 +59,6 @@ async function updatePatientProfile(req, res) {
 
         if (phoneNumber) {
             patient.phoneNumber = phoneNumber
-        }
-
-        if (password) {
-            patient.password = password
         }
 
         await patient.save()

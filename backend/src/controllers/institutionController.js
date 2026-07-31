@@ -1,9 +1,12 @@
+import Institution from "../models/institutionModel"
 
 
 async function getInstitutionProfile(req, res) {
     try {
         const institutionId = req.user.id
-        const institution = await User.findByPk(institutionId)
+        const institution = await User.findByPk(institutionId, {
+            include: Institution
+        })
 
         if (!institution) {
             return res.status(404).json({

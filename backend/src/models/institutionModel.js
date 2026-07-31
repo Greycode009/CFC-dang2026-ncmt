@@ -12,23 +12,23 @@ const Institution = sequelize.define(
         },
         institutionType: {
             type: DataTypes.ENUM("hospital", "clinic"),
-            allowNull: false
+            allowNull: true
         },
         registrationNumber: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
         province: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
         district: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
         municipality: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
         fullAddress: {
             type: DataTypes.TEXT,
@@ -44,27 +44,35 @@ const Institution = sequelize.define(
         },
         openingTime: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
         ClosingTime: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
         beds: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
         noOfDoctor: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: true
         },
         authPersonName: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
         authPersonNumber: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
+        },
+        profileCompleted: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
+        },
+        verificationStatus: {
+            type: DataTypes.ENUM("pending", "verified", "rejected"),
+            defaultValue: "pending"
         }
     },
     {

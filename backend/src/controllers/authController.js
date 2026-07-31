@@ -2,121 +2,205 @@ import { envConfig } from "../config/config.js";
 import User from "../models/userModel.js";
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
+import Patient from "../models/patientModel.js";
+import Institution from "../models/institutionModel.js";
+import { Op } from "sequelize";
+import { sequelize } from "../config/database.js";
 
 
 async function register(req, res) {
+    const transaction = await sequelize.transaction();
     try {
-        const { fullName, email, phoneNumber, password, role } = req.body;
-
-        if (!fullName || !email || !phoneNumber || !password || !role) {
+        const { fullName, email, phoneNumber, password, confirmPassword, role } = req.body;
+        if ( !fullName || !email || !phoneNumber || !password || !role ) {
+            await transaction.rollback();
             return res.status(400).json({
-                message: "Please provide all required fields"
+                message: "Please provide all required fields."
+            });
+        }
+        if (!["patient", "institution"].includes(role)) {
+            await transaction.rollback();
+            return res.status(400).json({
+                message: "Invalid role."
             });
         }
 
         const existingUser = await User.findOne({
-            where:
-            {
-                email
+            where: {
+                [Op.or]: [
+                    { email },
+                    { phoneNumber }
+                ]
             }
         });
 
         if (existingUser) {
+            await transaction.rollback();
             return res.status(400).json({
-                message: "Username already exists"
+                message: "Email or phone number already exists."
             });
         }
 
-        const allowedRoles = ["patient", "institution"];
-        if (!allowedRoles.includes(role)) {
+        if (password !== confirmPassword) {
+            await transaction.rollback();
             return res.status(400).json({
-                message: "Only patient and institution registration is allowed."
+                message: "Passwords do not match."
             });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        const user = await User.create(
+            {
+                fullName,
+                email,
+                phoneNumber,
+                password: hashedPassword,
+                role
+            },
+            {
+                transaction
+            }
+        );
 
-        const user = await User.create({
-            fullName,
-            email,
-            phoneNumber,
-            password: hashedPassword,
-            role
-        });
+        if (role === "patient") {
+            await Patient.create(
+                {
+                    userId: user.id,
+                    profileCompleted: false
+                },
+                {
+                    transaction
+                }
+            );
+        } else {
+            await Institution.create(
+                {
+                    userId: user.id,
+                    profileCompleted: false,
+                    verificationStatus: "draft"
+                },
+                {
+                    transaction
+                }
+            );
+        }
+        await transaction.commit();
 
-        const token = jwt.sign({
-            id: user.id,
-            email: user.email,
-            role: user.role
-        }, envConfig.jwtSecret, {
-            expiresIn: envConfig.jwtExpiresIn
-        });
+        const token = jwt.sign(
+            {
+                id: user.id,
+                role: user.role,
+                email: user.email
+            },
+            envConfig.jwtSecret,
+            {
+                expiresIn: envConfig.jwtExpiresIn
+            }
+        );
 
-        res.status(201).json({
-            message: "User registered successfully",
+        return res.status(201).json({
+            message: "Registration successful.",
+            token,
             user: {
                 id: user.id,
+                fullName: user.fullName,
                 email: user.email,
+                phoneNumber: user.phoneNumber,
                 role: user.role
-            },
-            token
-        })
+            }
+        });
     } catch (error) {
-        console.error("Error during registration:", error);
-        res.status(500).json({
-            message: "Internal server error"
+        await transaction.rollback();
+        console.error(error);
+        return res.status(500).json({
+            message: "Internal server error."
         });
     }
 }
 
 async function login(req, res) {
-    const { email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({
-            message: "Please provide all required fields"
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Email and password are required."
+            });
+        }
+
+        const user = await User.findOne({
+            where: {
+                email
+            }
         });
-    }
 
-    const user = await User.findOne({
+        if (!user) {
+            return res.status(401).json({
+                message: "Invalid email or password."
+            });
+        }
+
+        const matched = await bcrypt.compare(password, user.password);
+
+        if (!matched) {
+            return res.status(401).json({
+                message: "Invalid email or password."
+            });
+        }
+
+        let profileCompleted = false;
+
+if (user.role === "patient") {
+    const patient = await Patient.findOne({
         where: {
-            email
+            userId: user.id
         }
     });
 
-    if (!user) {
-        return res.status(401).json({
-            message: "Invalid credentials"
-        });
-    }
+    profileCompleted = patient?.profileCompleted ?? false;
 
-    const validPassword = await bcrypt.compare(password, user.password);
+} else if (user.role === "institution") {
 
-    if (!validPassword) {
-        return res.status(401).json({
-            message: "Invalid credentials"
-        });
-    }
-
-    const token = jwt.sign({
-        id: user.id,
-        email: user.email,
-        role: user.role
-    }, envConfig.jwtSecret, {
-        expiresIn: envConfig.jwtExpiresIn
-    });
-
-    res.status(200).json({
-        token,
-        user: {
-            id: user.id,
-            fullName: user.fullName,
-            email: user.email,
-            phoneNumber: user.phoneNumber,
-            role: user.role
+    const institution = await Institution.findOne({
+        where: {
+            userId: user.id
         }
     });
+
+    profileCompleted = institution?.profileCompleted ?? false;
+}
+
+        const token = jwt.sign(
+            {
+                id: user.id,
+                role: user.role,
+                email: user.email
+            },
+            envConfig.jwtSecret,
+            {
+                expiresIn: envConfig.jwtExpiresIn
+            }
+        );
+
+        return res.status(200).json({
+            message: "Login successfully",
+            token,
+            user: {
+                id: user.id,
+                fullName: user.fullName,
+                email: user.email,
+                phoneNumber: user.phoneNumber,
+                role: user.role,
+                profileCompleted
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Internal server error."
+        });
+    }
 }
 
 export {
