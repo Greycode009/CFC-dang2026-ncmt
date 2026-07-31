@@ -1,11 +1,9 @@
 
+import UserSelect from "./UserSelect";
 
 const Signup = () => {
-  return (
-    <>
-      
-    </>
-  )
-}
+  return <UserSelect />;
+};
 
-export default Signup
+export default Signup;
+
