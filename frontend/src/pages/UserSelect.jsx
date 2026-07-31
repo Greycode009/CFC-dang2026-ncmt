@@ -5,7 +5,7 @@ import { FaPlus, FaUser, FaHospital } from "react-icons/fa";
 
 const UserSelect = () => {
   const navigate = useNavigate();
-  const [selectedType, setSelectedType] = useState("patient");
+  const [selectedType, setSelectedType] = useState("");
 
   const handlePatientClick = () => {
     setSelectedType("patient");

@@ -68,6 +68,17 @@ const Navbar = () => {
           >
             About
           </NavLink>
+
+          <NavLink
+            to="/health-history"
+            className={({ isActive }) =>
+              isActive
+                ? "text-sm font-semibold text-[#0d9488]"
+                : "text-sm font-semibold text-slate-700 hover:text-[#0d9488] transition"
+            }
+          >
+            Health History
+          </NavLink>
         </nav>
 
         {/* 3. BUTTONS (Login & Sign Up) */}

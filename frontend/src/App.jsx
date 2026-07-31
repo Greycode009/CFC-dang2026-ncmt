@@ -9,27 +9,34 @@ import Signup from "./pages/Signup";
 import UserSelect from "./pages/UserSelect";
 import PatientRegister from "./pages/PatientRegister";
 import InstituteRegister from "./pages/InstituteRegister";
-import ProfileUpdate from "./pages/ProfileUpdate";
+import PatientProfile from "./pages/PatientProfile";
+import InstituteProfile from "./pages/InstituteProfile";
+import HealthHistory from "./pages/HealthHistory";
 
 const App = () => {
   return (
-    <>
-      <Navbar />
-      <main>
-        <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/hospitals" element={<Hospitals />} />
-          <Route path="/ai-assistant" element={<AIAssistant />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/user-select" element={<UserSelect />} />
-          <Route path="/signup/patient" element={<PatientRegister />} />
-          <Route path="/signup/institute" element={<InstituteRegister />} />
-          <Route path="/update-profile" element={<ProfileUpdate />} />
-        </Routes>
-      </main>
-    </>
+    <div className="min-h-screen flex flex-col justify-between">
+      <div>
+        <Navbar />
+        <main>
+          <Routes>
+            <Route path="/" element={<Homepage />} />
+            <Route path="/hospitals" element={<Hospitals />} />
+            <Route path="/ai-assistant" element={<AIAssistant />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/user-select" element={<UserSelect />} />
+            <Route path="/signup/patient" element={<PatientRegister />} />
+            <Route path="/signup/institute" element={<InstituteRegister />} />
+            <Route path="/patient/profile" element={<PatientProfile />} />
+            <Route path="/institute/profile" element={<InstituteProfile />} />
+            <Route path="/health-history" element={<HealthHistory />} />
+          </Routes>
+        </main>
+      </div>
+
+    </div>
   );
 };
 
