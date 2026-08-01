@@ -3,11 +3,13 @@ import { envConfig } from "./src/config/config.js";
 import { connectDB } from "./src/config/database.js";
 import "./src/models/index.js"
 import seedAdmin from "./src/seeders/adminSeeder.js";
+import seedInstitutions from "./src/seeders/institutionSeeder.js";
 
 
 const startServer = async () => {
     await connectDB()
     await seedAdmin()
+    await seedInstitutions()
 
     const port = envConfig.port || 4000
     app.listen(port, () => {

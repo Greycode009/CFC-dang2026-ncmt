@@ -49,51 +49,128 @@ Rules:
 - Do not diagnose with certainty.
 - Give only 2-4 possible conditions.
 - Urgency must be Low, Moderate or High.
-- Recommend ONE medical department.
+- Recommend ONE specific specialized medical department (e.g. Cardiology, Orthopedics, Neurology, Gastroenterology, Pulmonology, Dermatology, ENT, Pediatrics, Gynecology, Nephrology, General Medicine, Psychiatry).
+- NEVER set recommendedDepartment to "Emergency" or "Emergency Department". Always identify the actual specialized medical department (e.g. Cardiology for chest/heart pain, Orthopedics for bone/joint pain, Gastroenterology for stomach issues).
 - Give short home care advice.
 - If symptoms could indicate an emergency, set emergency=true.
 - Do NOT return markdown or any extra text.
 `;
 
-        const response = await ai.models.generateContent({
-            model: "gemini-flash-latest",
-            contents: prompt
-        });
+        let responseText = "";
+        const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-latest"];
 
-        let text = response.text
-            .replace(/```json/g, "")
-            .replace(/```/g, "")
-            .trim();
+        for (const modelName of modelsToTry) {
+            try {
+                const resGemini = await ai.models.generateContent({
+                    model: modelName,
+                    contents: prompt
+                });
+                if (resGemini && resGemini.text) {
+                    responseText = resGemini.text;
+                    break;
+                }
+            } catch (mErr) {
+                console.warn(`Gemini Model ${modelName} call warning:`, mErr?.message || mErr);
+            }
+        }
 
         let parsed;
 
-        try {
-            parsed = JSON.parse(text);
-        } catch (err) {
-            console.error("Invalid JSON returned by Gemini:");
-            console.log(text);
+        if (responseText) {
+            let cleanText = responseText
+                .replace(/```json/g, "")
+                .replace(/```/g, "")
+                .trim();
 
-            return res.status(500).json({
-                success: false,
-                message: "AI returned an invalid response."
-            });
+            try {
+                parsed = JSON.parse(cleanText);
+            } catch (err) {
+                console.error("Invalid JSON returned by Gemini:", cleanText);
+                parsed = null;
+            }
         }
 
-        // Search verified hospitals with matching department
-        const hospitals = await Institution.findAll({
-            where: {
-                verificationStatus: "verified",
-                department: {
-                    [Op.iLike]: `%${parsed.recommendedDepartment}%`
-                }
-            },
-            include: [
-                {
-                    model: User,
-                    attributes: ["fullName", "phoneNumber", "email"]
-                }
-            ]
-        });
+        // Local Rule Triage Fallback if API key/quota or JSON parse fails
+        if (!parsed) {
+            const lowerSymptoms = symptoms.toLowerCase();
+            let dept = "General Medicine";
+            let conditions = ["Viral Infection", "General Fatigue"];
+            let urgency = "Moderate";
+            let isEmergency = false;
+
+            if (lowerSymptoms.includes("chest") || lowerSymptoms.includes("heart") || lowerSymptoms.includes("breath")) {
+                dept = "Cardiology";
+                conditions = ["Cardiovascular Strain", "Angina Pectoris"];
+                urgency = "High";
+                isEmergency = lowerSymptoms.includes("severe") || lowerSymptoms.includes("sharp");
+            } else if (lowerSymptoms.includes("stomach") || lowerSymptoms.includes("abdominal") || lowerSymptoms.includes("vomit") || lowerSymptoms.includes("nausea")) {
+                dept = "Gastroenterology";
+                conditions = ["Acute Gastritis", "Gastroenteritis", "Digestive Upset"];
+                urgency = "Moderate";
+            } else if (lowerSymptoms.includes("bone") || lowerSymptoms.includes("joint") || lowerSymptoms.includes("fracture") || lowerSymptoms.includes("knee") || lowerSymptoms.includes("back")) {
+                dept = "Orthopedics";
+                conditions = ["Joint Inflammation", "Musculoskeletal Strain", "Arthritis"];
+                urgency = "Moderate";
+            } else if (lowerSymptoms.includes("skin") || lowerSymptoms.includes("rash") || lowerSymptoms.includes("itch")) {
+                dept = "Dermatology";
+                conditions = ["Allergic Dermatitis", "Skin Irritation"];
+                urgency = "Low";
+            } else if (lowerSymptoms.includes("headache") || lowerSymptoms.includes("migraine") || lowerSymptoms.includes("dizzy")) {
+                dept = "Neurology";
+                conditions = ["Tension Headache", "Migraine", "Neuralgic Fatigue"];
+                urgency = "Moderate";
+            }
+
+            parsed = {
+                possibleConditions: conditions,
+                urgency: urgency,
+                recommendedDepartment: dept,
+                homeCare: "Maintain adequate hydration, get bed rest, and monitor body vitals.",
+                warning: "If symptoms persist beyond 48 hours or worsen unexpectedly, consult a medical specialist immediately.",
+                emergency: isEmergency
+            };
+        }
+
+        // Search verified hospitals & clinics STRICTLY matching specialized departments (excluding generic "Emergency")
+        let hospitals = [];
+        
+        const deptTerms = [];
+        if (parsed.recommendedDepartment && typeof parsed.recommendedDepartment === "string") {
+            const cleanDept = parsed.recommendedDepartment.trim();
+            if (!cleanDept.toLowerCase().includes("emergency")) {
+                deptTerms.push(cleanDept);
+                const words = cleanDept.split(/[\s,/-]+/).filter(w => w.length > 3 && !w.toLowerCase().includes("emergency"));
+                words.forEach(w => {
+                    if (!deptTerms.includes(w)) {
+                        deptTerms.push(w);
+                    }
+                });
+            }
+        }
+
+        // Filter out any "emergency" terms so we match specific departments like Cardiology, Orthopedics, etc.
+        const filteredTerms = deptTerms.filter(t => !t.toLowerCase().includes("emergency"));
+
+        if (filteredTerms.length > 0) {
+            const orConditions = [];
+            filteredTerms.forEach(term => {
+                orConditions.push({ department: { [Op.iLike]: `%${term}%` } });
+                orConditions.push({ services: { [Op.iLike]: `%${term}%` } });
+            });
+
+            hospitals = await Institution.findAll({
+                where: {
+                    verificationStatus: "verified",
+                    [Op.or]: orConditions
+                },
+                include: [
+                    {
+                        model: User,
+                        attributes: ["fullName", "phoneNumber", "email"]
+                    }
+                ]
+            });
+        }
 
         return res.status(200).json({
             success: true,
@@ -106,7 +183,7 @@ Rules:
 
         return res.status(500).json({
             success: false,
-            message: "AI service failed."
+            message: "AI service failed. Please try again."
         });
     }
 }

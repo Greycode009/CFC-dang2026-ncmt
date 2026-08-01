@@ -4,7 +4,7 @@ import { Op } from "sequelize";
 
 async function getVerifiedHospitals(req, res) {
     try {
-        const hospitals = await Institution.findAll({
+        let hospitals = await Institution.findAll({
             where: {
                 verificationStatus: "verified"
             },
@@ -21,11 +21,29 @@ async function getVerifiedHospitals(req, res) {
             ],
             order: [["createdAt", "DESC"]]
         });
+
+        if (hospitals.length === 0) {
+            hospitals = await Institution.findAll({
+                include: [
+                    {
+                        model: User,
+                        attributes: [
+                            "id",
+                            "fullName",
+                            "email",
+                            "phoneNumber"
+                        ]
+                    }
+                ],
+                order: [["createdAt", "DESC"]]
+            });
+        }
+
         return res.status(200).json({
             hospitals
         });
     } catch (error) {
-        console.error("Error ", error);
+        console.error("Error fetching hospitals:", error);
         return res.status(500).json({
             message: "Internal server error."
         });

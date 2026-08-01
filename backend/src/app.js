@@ -5,7 +5,6 @@ import institutionRoute from "./routes/institutionRoutes.js"
 import adminRoute from "./routes/adminRoutes.js"
 import hospitalRoute from "./routes/hospitalRoutes.js"
 import path from "path";
-import medicalRecordRoute from "./routes/medicalRecordRoutes.js"
 import appointmentRoute from "./routes/appointmentRoutes.js"
 import cors from "cors"
 import symptomRoute from "./routes/symptomRoutes.js"
@@ -30,7 +29,6 @@ app.use("/api/patients", patientRoute)
 app.use("/api/institutions", institutionRoute)
 app.use("/api/admin", adminRoute)
 app.use("/api/hospitals", hospitalRoute);
-app.use("/api/medical-records", medicalRecordRoute);
 app.use("/api/appointments", appointmentRoute)
 app.use("/api/symptoms", symptomRoute);
 
