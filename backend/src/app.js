@@ -21,7 +21,7 @@ app.use(
 app.use("/api/auth", authRouter)
 app.use("/api/patients", patientRoute)
 app.use("/api/institutions", institutionRoute)
-app.use("api/admin", adminRoute)
+app.use("/api/admin", adminRoute)
 app.use("/api/hospitals", hospitalRoute);
 app.use("/api/medical-records", medicalRecordRoute);
 

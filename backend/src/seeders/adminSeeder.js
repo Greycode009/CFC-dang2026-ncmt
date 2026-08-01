@@ -22,7 +22,6 @@ async function seedAdmin() {
             email: envConfig.adminEmail,
             phoneNumber: envConfig.adminPhone,
             password: hashedPassword,
-            confirmPassword: envConfig.adminConfirmPassword,
             role: "admin"
         });
 

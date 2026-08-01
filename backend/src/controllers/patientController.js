@@ -1,3 +1,4 @@
+import { Op } from "sequelize"
 import Patient from "../models/patientModel.js"
 import User from "../models/userModel.js"
 
@@ -14,7 +15,7 @@ async function getPatientProfile(req, res) {
                     model: User,
                     attributes: [
                         "id",
-                        "fullnName",
+                        "fullName",
                         "email",
                         "phoneNumber",
                         "role"
@@ -44,30 +45,34 @@ async function getPatientProfile(req, res) {
 async function updatePatientProfile(req, res) {
     try {
         const { fullName, email, phoneNumber, age, gender, height, weight, bloodGroup, allergies, chronicConditions, currentMedications, emergencyContactName, emergencyContactNumber, address} = req.body
-        const user = await Patient.findByPk(req.user.id)
+        const user = await User.findByPk(req.user.id)
         const patient = await Patient.findOne({
             where: {
                 userId: req.user.id
             }
         })
 
-        const existingUser = await User.findOne({
-            where: {
-                [Op.or]: [
-                    { email },
-                    { phoneNumber }
-                ],
-                id: {
-                    [Op.ne]: req.user.id
+        let existingUser = null;
+
+        if (email || phoneNumber) {
+            existingUser = await User.findOne({
+                where: {
+                    [Op.or]: [
+                        ...(email ? [{ email }] : []),
+                        ...(phoneNumber ? [{ phoneNumber }] : [])
+                    ],
+                    id: {
+                        [Op.ne]: req.user.id
+                    }
                 }
-            }
-        });
+            });
 
         if (existingUser) {
-    return res.status(400).json({
-        message: "Email or phone number already exists."
-    });
-}
+            return res.status(400).json({
+                message: "Email or phone number already exists."
+            });
+        }
+    }
 
         if (!user || !patient) {
             return res.status(404).json({
@@ -145,6 +150,7 @@ async function updatePatientProfile(req, res) {
 
         return res.status(200).json({
             message: "Patient profile updated successfully",
+            user,
             patient
         })
     } catch (error) {

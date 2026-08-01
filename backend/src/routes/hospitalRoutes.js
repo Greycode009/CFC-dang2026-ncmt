@@ -1,10 +1,6 @@
 import express from "express";
 
-import {
-    getVerifiedHospitals,
-    searchHospitals,
-    getHospitalDetails
-} from "../controllers/hospitalController.js";
+import { getVerifiedHospitals, searchHospitals, getHospitalDetails } from "../controllers/hospitalController.js";
 
 const hospitalRoute = express.Router();
 hospitalRoute.get("/", getVerifiedHospitals);

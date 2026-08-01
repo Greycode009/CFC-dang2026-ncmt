@@ -35,10 +35,6 @@ async function getVerifiedHospitals(req, res) {
 async function searchHospitals(req, res) {
     try {
         const { district, municipality, department, services } = req.query;
-
-        const where = {
-            verificationStatus: "verified"
-        };
         if (district) {
             where.district = district;
         }
@@ -55,19 +51,18 @@ async function searchHospitals(req, res) {
                 [Op.iLike]: `%${services}%`
             };
         }
-        const hospitals = await Institution.findAll({
-            where,
-            include: [
-                {
-                    model: User,
-                    attributes: [
-                        "fullName",
-                        "phoneNumber"
-                    ]
-                }
-            ]
-        });
+        const hospitals = await Institution.findAll(
+            {
+                include: [
+                    {
+                        model: User,
+                        attributes: ["fullName", "email", "phoneNumber"]
+                    }
+                ]
+            }
+        )
         return res.status(200).json({
+            count: hospitals.length,
             hospitals
         });
     } catch (error) {

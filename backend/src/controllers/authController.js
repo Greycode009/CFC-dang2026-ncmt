@@ -78,7 +78,7 @@ async function register(req, res) {
                 {
                     userId: user.id,
                     profileCompleted: false,
-                    verificationStatus: "draft"
+                    verificationStatus: "pending"
                 },
                 {
                     transaction

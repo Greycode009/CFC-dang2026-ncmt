@@ -5,9 +5,9 @@ import User from "../models/userModel.js"
 
 async function getInstitutionProfile(req, res) {
     try {
-        const institution = await User.findOne({
+        const institution = await Institution.findOne({
             where: {
-                id: req.user.id
+                userId: req.user.id
             },
             include: [
                 {
@@ -45,7 +45,7 @@ async function updateInstitutionProfile(req, res) {
     try {
         const { fullName, email, phoneNumber, institutionType, registrationNumber, province, district, municipality, fullAddress, department, services, openingTime, closingTime, beds, noOfDoctor, authPersonName, authPersonNumber } = req.body
         const user = await User.findByPk(req.user.id)
-        const institution = await User.findOne({
+        const institution = await Institution.findOne({
             where: {
                 userId: req.user.id
             }
@@ -57,22 +57,38 @@ async function updateInstitutionProfile(req, res) {
             })
         }
 
-        const existingUser = await User.findOne({
-            where: {
-                [Op.or]: [
-                    { email },
-                    { phoneNumber }
-                ],
-                id: {
-                    [Op.ne]: req.user.id
-                }
-            }
-        });
+        if (email || phoneNumber) {
 
-        if (existingUser) {
-            return res.status(400).json({
-                message: "Email or phone number already exists."
+            const conditions = [];
+
+            if (email) {
+                conditions.push({ email });
+            }
+
+            if (phoneNumber) {
+                conditions.push({ phoneNumber });
+            }
+
+            const existingUser = await User.findOne({
+                where: {
+                    [Op.and]: [
+                        {
+                            [Op.or]: conditions
+                        },
+                        {
+                            id: {
+                                [Op.ne]: req.user.id
+                            }
+                        }
+                    ]
+                }
             });
+
+            if (existingUser) {
+                return res.status(400).json({
+                    message: "Email or phone number already exists."
+                });
+            }
         }
 
         if (fullName) {
@@ -159,7 +175,8 @@ async function updateInstitutionProfile(req, res) {
 
         return res.status(200).json({
             message: "Institution profile updated successfully",
-            institution
+            institution,
+            user
         })
     } catch (error) {
         console.error("Error updating institution profile:", error)

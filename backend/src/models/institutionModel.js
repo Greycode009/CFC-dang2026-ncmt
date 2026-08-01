@@ -46,7 +46,7 @@ const Institution = sequelize.define(
             type: DataTypes.STRING,
             allowNull: true
         },
-        ClosingTime: {
+        closingTime: {
             type: DataTypes.STRING,
             allowNull: true
         },
