@@ -1,40 +1,26 @@
 import React, { useState, useEffect } from "react";
-import { FaSpinner, FaPlus } from "react-icons/fa";
-import HospitalList from "../components/Hospitals/HospitalList";
-import CalendarPicker from "../components/Hospitals/CalendarPicker";
-import TimeSlotPicker from "../components/Hospitals/TimeSlotPicker";
-import AppointmentSummaryCard from "../components/Hospitals/AppointmentSummaryCard";
-import AppointmentConfirmation from "../components/Hospitals/AppointmentConfirmation";
-import { fetchHospitals, getHospitalById, bookAppointment } from "../api";
+import { useNavigate } from "react-router-dom";
+import { FaSpinner, FaPlus, FaHospital, FaStar, FaMapMarkerAlt, FaCalendarPlus, FaPhoneAlt, FaStethoscope } from "react-icons/fa";
+import { fetchHospitals } from "../api";
 import { useAuth } from "../context/AuthContext";
 
 const Hospitals = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   const [loading, setLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [hospitalsList, setHospitalsList] = useState([]);
-  const [isConfirmed, setIsConfirmed] = useState(false);
-  const [selectedHospitalId, setSelectedHospitalId] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(18);
-  const [monthName, setMonthName] = useState("Kartik 2080");
-  const [selectedTime, setSelectedTime] = useState("10:30 AM");
-
-  // Default time slots (backend does not expose a separate slots endpoint per api.md)
-  const timeSlots = ["9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "2:00 PM", "2:30 PM", "3:00 PM"];
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedType, setSelectedType] = useState("all");
 
   // Fetch Hospitals on Mount
   useEffect(() => {
     async function loadData() {
       setLoading(true);
       try {
-        // GET /api/hospitals — returns { hospitals: [...] }
         const data = await fetchHospitals();
         const list = data?.hospitals || data || [];
         setHospitalsList(list);
-        if (list.length > 0) {
-          setSelectedHospitalId(list[0].id);
-        }
       } catch (err) {
         console.error("Failed to load hospitals from API:", err);
       } finally {
@@ -44,132 +30,155 @@ const Hospitals = () => {
     loadData();
   }, []);
 
-  // Handle hospital selection change
-  const handleSelectHospital = (id) => {
-    setSelectedHospitalId(id);
-  };
+  // Filter hospitals list
+  const filteredHospitals = hospitalsList.filter((inst) => {
+    const name = inst.User?.fullName || inst.name || "";
+    const type = inst.institutionType || "hospital";
+    const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          (inst.district || "").toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = selectedType === "all" || type.toLowerCase() === selectedType.toLowerCase();
+    return matchesSearch && matchesType;
+  });
 
-  // Handle date picker selection
-  const handleSelectDate = (dayNum, month) => {
-    setSelectedDate(dayNum);
-    if (month) {
-      setMonthName(month);
-    }
-  };
-
-  // Submit appointment — POST /api/appointments
-  const handleConfirm = async () => {
-    setIsSubmitting(true);
-    try {
-      // api.md 5.1: { institutionId, appointmentDate, appointmentTime, reason }
-      await bookAppointment({
-        institutionId: selectedHospitalId,
-        appointmentDate: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, "0")}-${String(selectedDate).padStart(2, "0")}`,
-        appointmentTime: selectedTime,
-        reason: "General Health Checkup & Consultation",
-      });
-      setIsConfirmed(true);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      alert("Failed to book appointment: " + (err.response?.data?.message || err.message));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // selectedHospital — mapped to match HospitalCard shape from api.md response
-  // api.md returns: { id, institutionType, district, municipality, department, services, User: { fullName, phoneNumber } }
-  const selectedHospital = hospitalsList.find((h) => h.id === selectedHospitalId) || hospitalsList[0] || {};
-  const selectedHospitalName = selectedHospital?.User?.fullName || selectedHospital?.name || "";
-  const selectedHospitalLocation = [selectedHospital?.municipality, selectedHospital?.district].filter(Boolean).join(", ");
-
-  // If appointment confirmed -> Render Confirmation Success View (Image 2)
-  if (isConfirmed) {
-    return (
-      <AppointmentConfirmation
-        selectedHospitalName={selectedHospitalName}
-        selectedHospitalLocation={selectedHospitalLocation}
-        selectedDate={selectedDate}
-        monthName={monthName}
-        selectedTime={selectedTime}
-        onReset={() => setIsConfirmed(false)}
-      />
-    );
-  }
-
-  // Render Interactive Booking Form View (Image 1)
   return (
     <div className="min-h-screen bg-slate-50/50 flex flex-col justify-between">
       
-      {/* MAIN CONTENT AREA */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 w-full">
+      {/* MAIN CONTENT CONTAINER */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 w-full">
         
-        {/* PAGE HEADER */}
-        <div className="space-y-3">
-          <span className="inline-block px-3 py-1 bg-[#e6f7f3] text-[#0d9488] text-[11px] font-extrabold uppercase tracking-wider rounded-full">
-            Appointment Booking
-          </span>
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-            Book a Clinical Visit
-          </h1>
-          <p className="text-slate-500 text-xs sm:text-sm max-w-2xl leading-relaxed">
-            Secure an instantly confirmed slot at your preferred healthcare center. Our platform connects directly with the hospital's real-time databases for guaranteed times.
-          </p>
+        {/* PAGE HEADER BANNER */}
+        <div className="bg-[#ebfef7] rounded-3xl p-6 sm:p-8 border border-teal-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <span className="inline-block px-3 py-1 bg-white text-[#0d9488] text-[11px] font-extrabold uppercase tracking-wider rounded-full shadow-xs">
+              Healthcare Network
+            </span>
+            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              Explore Partner Hospitals & Clinics
+            </h1>
+            <p className="text-slate-600 text-xs sm:text-sm max-w-2xl leading-relaxed">
+              Find verified medical institutions, specialized departments, and emergency care centers across Nepalgunj and Banke.
+            </p>
+          </div>
+
+          <button
+            onClick={() => navigate("/appointments")}
+            className="px-6 py-3 bg-[#0d9488] hover:bg-[#0f896f] text-white font-bold text-xs sm:text-sm rounded-2xl shadow-sm transition flex items-center space-x-2 cursor-pointer flex-shrink-0"
+          >
+            <FaCalendarPlus className="text-base" />
+            <span>Book Appointment Hub</span>
+          </button>
         </div>
 
+        {/* SEARCH & FILTER CONTROLS */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
+          {/* Search Input */}
+          <div className="w-full sm:w-96">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by facility name or location..."
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#0d9488]"
+            />
+          </div>
+
+          {/* Filter Pills */}
+          <div className="flex items-center space-x-2 w-full sm:w-auto overflow-x-auto">
+            {["all", "hospital", "clinic"].map((type) => (
+              <button
+                key={type}
+                onClick={() => setSelectedType(type)}
+                className={`px-4 py-2 rounded-xl text-xs font-bold capitalize transition cursor-pointer ${
+                  selectedType === type
+                    ? "bg-[#0d9488] text-white"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                {type === "all" ? "All Facilities" : `${type}s`}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* HOSPITALS GRID LIST */}
         {loading ? (
           <div className="py-20 flex flex-col items-center justify-center space-y-3 text-slate-500">
             <FaSpinner className="animate-spin text-3xl text-[#0d9488]" />
-            <p className="text-xs font-semibold">Connecting to healthcare database...</p>
+            <p className="text-xs font-semibold">Loading registered healthcare institutions...</p>
+          </div>
+        ) : filteredHospitals.length === 0 ? (
+          <div className="bg-white rounded-3xl p-10 border border-slate-200/80 text-center space-y-3 max-w-md mx-auto">
+            <FaHospital className="text-4xl text-slate-300 mx-auto" />
+            <h3 className="text-base font-bold text-slate-800">No Hospitals Found</h3>
+            <p className="text-xs text-slate-500">Try adjusting your search query or filters.</p>
           </div>
         ) : (
-          /* 3-COLUMN BOOKING FLOW */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            
-            {/* STEP 1: SELECT HOSPITAL */}
-            <div className="lg:col-span-4">
-              <HospitalList
-                hospitals={hospitalsList}
-                selectedHospitalId={selectedHospitalId}
-                onSelectHospital={handleSelectHospital}
-              />
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredHospitals.map((inst) => {
+              const name = inst.User?.fullName || inst.name || "Medical Facility";
+              const phone = inst.User?.phoneNumber || "N/A";
+              const location = [inst.fullAddress || inst.municipality, inst.district].filter(Boolean).join(", ") || "Nepalgunj, Banke";
 
-            {/* STEP 2: CHOOSE DATE & TIME */}
-            <div className="lg:col-span-4 space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-7 h-7 rounded-full bg-[#0d9488]/15 text-[#0d9488] font-bold text-xs flex items-center justify-center border border-[#0d9488]/30">
-                  2
+              return (
+                <div
+                  key={inst.id}
+                  className="bg-white rounded-3xl border border-slate-200/80 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col justify-between group"
+                >
+                  <div className="space-y-4 p-6">
+                    {/* Header Icon & Type Badge */}
+                    <div className="flex items-start justify-between">
+                      <div className="w-12 h-12 rounded-2xl bg-teal-50 text-[#0d9488] border border-teal-100 flex items-center justify-center text-xl font-bold">
+                        <FaHospital />
+                      </div>
+                      <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-[10px] font-extrabold uppercase tracking-wider">
+                        {inst.institutionType || "Hospital"}
+                      </span>
+                    </div>
+
+                    {/* Hospital Info */}
+                    <div className="space-y-1">
+                      <h3 className="font-bold text-slate-900 text-lg group-hover:text-[#0d9488] transition">
+                        {name}
+                      </h3>
+                      <p className="text-xs text-slate-500 flex items-center space-x-1">
+                        <FaMapMarkerAlt className="text-teal-600 text-xs flex-shrink-0" />
+                        <span>{location}</span>
+                      </p>
+                    </div>
+
+                    {/* Departments & Services */}
+                    {inst.department && (
+                      <div className="text-xs text-slate-600 bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-1">
+                        <div className="flex items-center space-x-1 text-[#0d9488] font-bold text-[11px]">
+                          <FaStethoscope />
+                          <span>Specialties:</span>
+                        </div>
+                        <p className="text-slate-700 line-clamp-2 text-[11px]">
+                          {inst.department}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Card Footer Action */}
+                  <div className="px-6 pb-6 pt-2 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-xs text-slate-500 flex items-center space-x-1">
+                      <FaPhoneAlt className="text-slate-400 text-[10px]" />
+                      <span>{phone}</span>
+                    </span>
+
+                    <button
+                      onClick={() => navigate(`/appointments?hospitalId=${inst.id}`)}
+                      className="px-4 py-2 bg-[#0d9488] hover:bg-[#0f896f] text-white font-bold text-xs rounded-xl transition shadow-xs flex items-center space-x-1.5 cursor-pointer"
+                    >
+                      <FaCalendarPlus className="text-xs" />
+                      <span>Book Visit</span>
+                    </button>
+                  </div>
+
                 </div>
-                <h2 className="text-base font-bold text-slate-900">Choose Date & Time</h2>
-              </div>
-
-              <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-5 space-y-5">
-                <CalendarPicker
-                  selectedDate={selectedDate}
-                  onSelectDate={handleSelectDate}
-                />
-                <TimeSlotPicker
-                  timeSlots={timeSlots}
-                  selectedTime={selectedTime}
-                  onSelectTime={setSelectedTime}
-                />
-              </div>
-            </div>
-
-            {/* STEP 3: CONFIRM APPOINTMENT */}
-            <div className="lg:col-span-4">
-              <AppointmentSummaryCard
-                selectedHospitalName={selectedHospitalName}
-                selectedHospitalLocation={selectedHospitalLocation}
-                selectedDate={selectedDate}
-                monthName={monthName}
-                selectedTime={selectedTime}
-                isSubmitting={isSubmitting}
-                onConfirm={handleConfirm}
-              />
-            </div>
-
+              );
+            })}
           </div>
         )}
 
@@ -214,7 +223,7 @@ const Hospitals = () => {
 
           <div className="border-t border-slate-800/80 pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-400 gap-2">
             <p>© 2026 Med Assist Nepal. All rights reserved.</p>
-            <p>Designed for Ram Sharma • Nepalgunj, Banke</p>
+            <p>Designed for {user?.name || "Ram Sharma"} • Nepalgunj, Banke</p>
           </div>
         </div>
       </footer>

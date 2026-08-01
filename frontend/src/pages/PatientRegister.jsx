@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserPlus, FaEye, FaEyeSlash } from "react-icons/fa";
 import { registerUser } from "../api";
+import { useAuth } from "../context/AuthContext";
 
 const PatientRegister = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   // Form input state
   const [formData, setFormData] = useState({
@@ -46,7 +48,17 @@ const PatientRegister = () => {
     };
 
     try {
-      await registerUser(payload);
+      const res = await registerUser(payload);
+      if (res?.user) {
+        login(res.user.role || "patient", {
+          id: res.user.id,
+          name: res.user.fullName,
+          email: res.user.email,
+          phoneNumber: res.user.phoneNumber,
+          role: res.user.role || "patient",
+          profileCompleted: false,
+        });
+      }
       navigate("/patient/profile");
     } catch (err) {
       alert("Registration failed: " + (err.response?.data?.message || err.message || "Please try again."));

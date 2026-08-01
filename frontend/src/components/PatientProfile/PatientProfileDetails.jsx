@@ -1,13 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { 
-  FaUser, 
-  FaEdit, 
-  FaHeartbeat, 
-  FaNotesMedical, 
-  FaPhoneAlt, 
-  FaEnvelope, 
-  FaMapMarkerAlt, 
+import {
+  FaUser,
+  FaEdit,
+  FaHeartbeat,
+  FaNotesMedical,
+  FaPhoneAlt,
+  FaEnvelope,
+  FaMapMarkerAlt,
   FaShieldAlt,
   FaArrowLeft
 } from "react-icons/fa";
@@ -19,7 +19,7 @@ const PatientProfileDetails = ({ profileData, onEdit }) => {
   return (
     <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
-        
+
         {/* Navigation & Header */}
         <div className="flex items-center justify-between">
           <Link
@@ -65,13 +65,13 @@ const PatientProfileDetails = ({ profileData, onEdit }) => {
             className="w-full sm:w-auto px-6 py-3 bg-[#0d9488] hover:bg-[#0f896f] text-white font-bold text-xs rounded-2xl shadow-sm transition flex items-center justify-center space-x-2 cursor-pointer"
           >
             <FaEdit className="text-sm" />
-            <span>Edit Profile (PATCH)</span>
+            <span>Edit Profile</span>
           </button>
         </div>
 
         {/* DETAILS GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
+
           {/* Section 1: Demographics & Vitals */}
           <div className="bg-white rounded-3xl border border-slate-200/80 p-6 space-y-4 shadow-xs">
             <div className="flex items-center space-x-2 text-[#0d9488] font-bold text-sm border-b border-slate-100 pb-3">
@@ -154,9 +154,7 @@ const PatientProfileDetails = ({ profileData, onEdit }) => {
         <div className="bg-slate-100 rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 border border-slate-200/70">
           <div>
             <h3 className="text-sm font-bold text-slate-900">Need to update your clinical details?</h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Click Edit Profile to send a PATCH request to <code className="text-[#0d9488] font-mono">/api/patients/profile</code>.
-            </p>
+
           </div>
           <button
             onClick={onEdit}

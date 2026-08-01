@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaPlus, FaEye, FaEyeSlash } from "react-icons/fa";
 import { registerUser } from "../api";
+import { useAuth } from "../context/AuthContext";
 
 const InstituteRegister = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   // Form input state
   const [formData, setFormData] = useState({
@@ -46,7 +48,17 @@ const InstituteRegister = () => {
     };
 
     try {
-      await registerUser(payload);
+      const res = await registerUser(payload);
+      if (res?.user) {
+        login(res.user.role || "institution", {
+          id: res.user.id,
+          name: res.user.fullName,
+          email: res.user.email,
+          phoneNumber: res.user.phoneNumber,
+          role: res.user.role || "institution",
+          profileCompleted: false,
+        });
+      }
       navigate("/institute/profile");
     } catch (err) {
       alert("Registration failed: " + (err.response?.data?.message || err.message || "Please try again."));

@@ -6,7 +6,6 @@ const AppointmentConfirmation = ({
   selectedHospitalName,
   selectedHospitalLocation,
   selectedDate,
-  monthName,
   selectedTime,
   onReset,
 }) => {
@@ -65,7 +64,7 @@ const AppointmentConfirmation = ({
               <div>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Scheduled Slot</p>
                 <p className="text-xs font-bold text-slate-900 mt-0.5">
-                  {monthName} {selectedDate} at {selectedTime}
+                  {selectedDate} at {selectedTime}
                 </p>
               </div>
             </div>
@@ -94,43 +93,7 @@ const AppointmentConfirmation = ({
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="w-full bg-[#1b2533] text-slate-300 pt-12 pb-8 mt-12 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto px-6 space-y-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="space-y-3">
-              <div className="inline-flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#0d9488] text-white flex items-center justify-center">
-                  <FaPlus className="text-sm" />
-                </div>
-                <span className="text-lg font-bold text-white">Med Assist</span>
-              </div>
-              <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
-                Your personal digital healthcare partner in Nepal.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-3">Support</h4>
-              <ul className="space-y-2 text-xs text-slate-400">
-                <li><a href="#" className="hover:text-white transition">FAQ Guidelines</a></li>
-                <li><a href="#" className="hover:text-white transition">Hospital Partners</a></li>
-                <li><a href="#" className="hover:text-white transition">Contact Helpline</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-3">Legal</h4>
-              <ul className="space-y-2 text-xs text-slate-400">
-                <li><a href="#" className="hover:text-white transition">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition">Terms of Practice</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-slate-800/80 pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-400 gap-2">
-            <p>© 2026 Med Assist Nepal. All rights reserved.</p>
-            <p>Nepalgunj, Banke</p>
-          </div>
-        </div>
-      </footer>
+      
     </div>
   );
 };

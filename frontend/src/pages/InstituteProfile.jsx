@@ -8,6 +8,7 @@ import {
   FaSpinner,
 } from "react-icons/fa";
 import Profile from "../components/Profile";
+import InstituteProfileDetails from "../components/InstituteProfile/InstituteProfileDetails";
 import FacilityBasicsStep from "../components/InstituteProfile/FacilityBasicsStep";
 import DepartmentsStep from "../components/InstituteProfile/DepartmentsStep";
 import OperatingHoursStep from "../components/InstituteProfile/OperatingHoursStep";
@@ -17,30 +18,34 @@ import { getInstitutionProfile, updateInstitutionProfile } from "../api";
 
 const InstituteProfile = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { user, login } = useAuth();
+  
+  const [isEditing, setIsEditing] = useState(false);
+  const [profileData, setProfileData] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [toast, setToast] = useState(null);
 
-  // Form State matching api.md section 3.2 schema
+  // Form State without hardcoded dummy defaults
   const [formData, setFormData] = useState({
-    fullName: "City General Hospital",
-    email: "info@cityhospital.com",
-    phoneNumber: "014200000",
-    institutionType: "hospital", // "hospital" | "clinic"
-    registrationNumber: "REG-123456",
-    province: "Lumbini",
-    district: "Banke",
-    municipality: "Nepalgunj Sub-Metropolitan",
-    fullAddress: "Ward No. 2, BBP Chowk",
-    department: "Emergency, Cardiology, Pediatrics",
-    services: "24/7 Emergency, ICU, OPD, Lab Tests",
-    openingTime: "08:00 AM",
-    closingTime: "08:00 PM",
-    beds: "150",
-    noOfDoctor: 45,
-    authPersonName: "Dr. Ram Sharma",
-    authPersonNumber: "9841234567",
+    fullName: "",
+    email: "",
+    phoneNumber: "",
+    institutionType: "hospital",
+    registrationNumber: "",
+    province: "",
+    district: "",
+    municipality: "",
+    fullAddress: "",
+    department: "",
+    services: "",
+    openingTime: "09:00 AM",
+    closingTime: "05:00 PM",
+    beds: "",
+    noOfDoctor: "",
+    authPersonName: "",
+    authPersonNumber: "",
   });
 
   // Load existing profile from GET /api/institutions/profile on mount
@@ -49,37 +54,38 @@ const InstituteProfile = () => {
       setLoading(true);
       try {
         const res = await getInstitutionProfile();
+        setProfileData(res);
         if (res?.institution) {
           const inst = res.institution;
           const u = inst.User || {};
           setFormData({
-            fullName: u.fullName || "City General Hospital",
-            email: u.email || "info@cityhospital.com",
-            phoneNumber: u.phoneNumber || "014200000",
+            fullName: u.fullName || user?.name || "",
+            email: u.email || user?.email || "",
+            phoneNumber: u.phoneNumber || "",
             institutionType: inst.institutionType || "hospital",
-            registrationNumber: inst.registrationNumber || "REG-123456",
-            province: inst.province || "Lumbini",
-            district: inst.district || "Banke",
-            municipality: inst.municipality || "Nepalgunj Sub-Metropolitan",
-            fullAddress: inst.fullAddress || "Ward No. 2, BBP Chowk",
-            department: inst.department || "Emergency, Cardiology, Pediatrics",
-            services: inst.services || "24/7 Emergency, ICU, OPD, Lab Tests",
-            openingTime: inst.openingTime || "08:00 AM",
-            closingTime: inst.closingTime || "08:00 PM",
-            beds: String(inst.beds || 150),
-            noOfDoctor: inst.noOfDoctor || 45,
-            authPersonName: inst.authPersonName || "Dr. Ram Sharma",
-            authPersonNumber: inst.authPersonNumber || "9841234567",
+            registrationNumber: inst.registrationNumber || "",
+            province: inst.province || "",
+            district: inst.district || "",
+            municipality: inst.municipality || "",
+            fullAddress: inst.fullAddress || "",
+            department: inst.department || "",
+            services: inst.services || "",
+            openingTime: inst.openingTime || "09:00 AM",
+            closingTime: inst.closingTime || "05:00 PM",
+            beds: inst.beds ? String(inst.beds) : "",
+            noOfDoctor: inst.noOfDoctor ? String(inst.noOfDoctor) : "",
+            authPersonName: inst.authPersonName || "",
+            authPersonNumber: inst.authPersonNumber || "",
           });
         }
       } catch (err) {
-        console.warn("Institute profile fetch fallback:", err);
+        console.warn("Institute profile fetch error:", err);
       } finally {
         setLoading(false);
       }
     }
     loadProfile();
-  }, []);
+  }, [user]);
 
   const steps = [
     { id: 1, label: "Facility Basics" },
@@ -97,6 +103,7 @@ const InstituteProfile = () => {
 
   const handleSaveProfile = async () => {
     setIsSaving(true);
+    setToast(null);
     try {
       const payload = {
         fullName: formData.fullName,
@@ -112,18 +119,34 @@ const InstituteProfile = () => {
         services: formData.services,
         openingTime: formData.openingTime,
         closingTime: formData.closingTime,
-        beds: formData.beds,
-        noOfDoctor: parseInt(formData.noOfDoctor) || 45,
+        beds: parseInt(formData.beds) || 0,
+        noOfDoctor: parseInt(formData.noOfDoctor) || 0,
         authPersonName: formData.authPersonName,
         authPersonNumber: formData.authPersonNumber,
       };
 
-      await updateInstitutionProfile(payload);
+      const res = await updateInstitutionProfile(payload);
+      setProfileData({
+        institution: {
+          ...payload,
+          User: {
+            fullName: payload.fullName,
+            email: payload.email,
+            phoneNumber: payload.phoneNumber,
+          },
+        },
+      });
+
       login("institution", { name: formData.fullName, email: formData.email });
-      alert("Institution profile updated successfully!");
-      navigate("/dashboard");
+      setToast({ type: "success", message: res?.message || "Institution profile updated successfully!" });
+      
+      setTimeout(() => {
+        setIsEditing(false);
+      }, 1200);
+
     } catch (err) {
-      alert("Failed to update profile: " + (err.response?.data?.message || err.message));
+      setToast({ type: "error", message: err.response?.data?.message || err.message || "Failed to update profile." });
+      setTimeout(() => setToast(null), 4000);
     } finally {
       setIsSaving(false);
     }
@@ -157,6 +180,19 @@ const InstituteProfile = () => {
         <FaSpinner className="animate-spin text-2xl text-[#0d9488]" />
         <span className="text-sm font-semibold">Loading Institution Profile...</span>
       </div>
+    );
+  }
+
+  // If user is not in editing mode, show the clean summary details view
+  if (!isEditing) {
+    return (
+      <InstituteProfileDetails
+        profileData={profileData}
+        onEdit={() => {
+          setCurrentStep(1);
+          setIsEditing(true);
+        }}
+      />
     );
   }
 
@@ -216,6 +252,8 @@ const InstituteProfile = () => {
       onSkip={handleSkip}
       isFirstStep={currentStep === 1}
       isLastStep={currentStep === steps.length}
+      isSaving={isSaving}
+      toast={toast}
       cardIcon={stepConfig.cardIcon}
       cardTitle={stepConfig.cardTitle}
       cardDescription={stepConfig.cardDescription}

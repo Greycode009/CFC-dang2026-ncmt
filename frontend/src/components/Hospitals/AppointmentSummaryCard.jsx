@@ -5,7 +5,6 @@ const AppointmentSummaryCard = ({
   selectedHospitalName,
   selectedHospitalLocation,
   selectedDate,
-  monthName,
   selectedTime,
   isSubmitting,
   onConfirm,
@@ -53,7 +52,7 @@ const AppointmentSummaryCard = ({
             <div>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Schedule</p>
               <p className="text-xs font-bold text-slate-900 mt-0.5">
-                {monthName} {selectedDate} at {selectedTime}
+                {selectedDate} at {selectedTime}
               </p>
             </div>
           </div>
