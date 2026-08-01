@@ -1,4 +1,4 @@
-import { where } from "sequelize"
+import { Op } from "sequelize"
 import Institution from "../models/institutionModel.js"
 import User from "../models/userModel.js"
 
@@ -43,7 +43,7 @@ async function getInstitutionProfile(req, res) {
 
 async function updateInstitutionProfile(req, res) {
     try {
-        const { fullName, email, phoneNumber, institutionType, registrationNumber, province, district, municipality, fullAddress, department, services, openingTime, closingTime, beds, noOfDoctor, authPersonName, authPersonNumber } = req.body
+        const { fullName, email, phoneNumber, institutionType, registrationNumber, province, district, municipality, fullAddress, department, services, openingTime, closingTime, beds, noOfDoctor, authPersonName, authPersonNumber, registrationFee, availableTimeSlots } = req.body
         const user = await User.findByPk(req.user.id)
         const institution = await Institution.findOne({
             where: {
@@ -91,56 +91,56 @@ async function updateInstitutionProfile(req, res) {
             }
         }
 
-        if (fullName) {
+        if (fullName !== undefined) {
             user.fullName = fullName
         }
 
-        if (email) {
+        if (email !== undefined) {
             user.email = email
         }
 
-        if (phoneNumber) {
+        if (phoneNumber !== undefined) {
             user.phoneNumber = phoneNumber
         }
         await user.save()
 
-        if (institutionType) {
+        if (institutionType !== undefined) {
             institution.institutionType = institutionType
         }
 
-        if (registrationNumber) {
+        if (registrationNumber !== undefined) {
             institution.registrationNumber = registrationNumber
         }
 
-        if (province) {
+        if (province !== undefined) {
             institution.province = province
         }
 
-        if (district) {
+        if (district !== undefined) {
             institution.district = district
         }
 
-        if (municipality) {
+        if (municipality !== undefined) {
             institution.municipality = municipality
         }
 
-        if (fullAddress) {
+        if (fullAddress !== undefined) {
             institution.fullAddress = fullAddress
         }
 
-        if (department) {
+        if (department !== undefined) {
             institution.department = department
         }
 
-        if (services) {
+        if (services !== undefined) {
             institution.services = services
         }
 
-        if (openingTime) {
+        if (openingTime !== undefined) {
             institution.openingTime = openingTime
         }
 
-        if (closingTime) {
+        if (closingTime !== undefined) {
             institution.closingTime = closingTime
         }
 
@@ -152,12 +152,20 @@ async function updateInstitutionProfile(req, res) {
             institution.noOfDoctor = noOfDoctor
         }
 
-        if (authPersonName) {
+        if (authPersonName !== undefined) {
             institution.authPersonName = authPersonName
         }
 
-        if (authPersonNumber) {
+        if (authPersonNumber !== undefined) {
             institution.authPersonNumber = authPersonNumber
+        }
+
+        if (registrationFee !== undefined) {
+            institution.registrationFee = registrationFee
+        }
+
+        if (availableTimeSlots !== undefined) {
+            institution.availableTimeSlots = availableTimeSlots
         }
 
         institution.profileCompleted =
@@ -166,8 +174,6 @@ async function updateInstitutionProfile(req, res) {
             !!institution.province &&
             !!institution.district &&
             !!institution.municipality &&
-            !!institution.openingTime &&
-            !!institution.closingTime &&
             !!institution.authPersonName &&
             !!institution.authPersonNumber;
 

@@ -2,8 +2,6 @@ import { Op } from "sequelize"
 import Patient from "../models/patientModel.js"
 import User from "../models/userModel.js"
 
-
-
 async function getPatientProfile(req, res) {
     try {
         const patient = await Patient.findOne({
@@ -44,7 +42,7 @@ async function getPatientProfile(req, res) {
 
 async function updatePatientProfile(req, res) {
     try {
-        const { fullName, email, phoneNumber, age, gender, height, weight, bloodGroup, allergies, chronicConditions, currentMedications, emergencyContactName, emergencyContactNumber, address} = req.body
+        const { fullName, email, phoneNumber, age, gender, height, weight, bloodGroup, allergies, chronicConditions, currentMedications, emergencyContactName, emergencyContactNumber, address } = req.body
         const user = await User.findByPk(req.user.id)
         const patient = await Patient.findOne({
             where: {
@@ -52,10 +50,14 @@ async function updatePatientProfile(req, res) {
             }
         })
 
-        let existingUser = null;
+        if (!user || !patient) {
+            return res.status(404).json({
+                message: "Patient profile not found"
+            })
+        }
 
         if (email || phoneNumber) {
-            existingUser = await User.findOne({
+            const existingUser = await User.findOne({
                 where: {
                     [Op.or]: [
                         ...(email ? [{ email }] : []),
@@ -67,75 +69,29 @@ async function updatePatientProfile(req, res) {
                 }
             });
 
-        if (existingUser) {
-            return res.status(400).json({
-                message: "Email or phone number already exists."
-            });
-        }
-    }
-
-        if (!user || !patient) {
-            return res.status(404).json({
-                message: "Patient not found"
-            })
+            if (existingUser) {
+                return res.status(400).json({
+                    message: "Email or phone number already exists."
+                });
+            }
         }
 
-        if (fullName) {
-            user.fullName = fullName
-        }
+        if (fullName) user.fullName = fullName;
+        if (email) user.email = email;
+        if (phoneNumber) user.phoneNumber = phoneNumber;
+        await user.save();
 
-        if (email) {
-            user.email = email
-        }
-
-        if (phoneNumber) {
-            user.phoneNumber = phoneNumber
-        }
-        await user.save()
-
-        if (age !== undefined) {
-            patient.age = age
-        }
-
-        if (gender !== undefined) {
-            patient.gender = gender
-        }
-
-        if (height !== undefined) {
-            patient.height = height
-        }
-
-        if (weight !== undefined) {
-            patient.weight = weight
-        }
-
-        if (bloodGroup) {
-            patient.bloodGroup = bloodGroup
-        }
-
-        if (allergies !== undefined) {
-            patient.allergies = allergies
-        }
-
-        if (chronicConditions !== undefined) {
-            patient.chronicConditions = chronicConditions
-        }
-
-        if (currentMedications !== undefined) {
-            patient.currentMedications = currentMedications
-        }
-
-        if (emergencyContactName) {
-            patient.emergencyContactName = emergencyContactName
-        }
-
-        if (emergencyContactNumber) {
-            patient.emergencyContactNumber = emergencyContactNumber
-        }
-
-        if (address) {
-            patient.address = address
-        }
+        patient.age = (age !== undefined && age !== null && age !== "" && !isNaN(Number(age))) ? Number(age) : null;
+        patient.gender = (gender && ["Male", "Female", "Other"].includes(gender)) ? gender : null;
+        patient.height = (height !== undefined && height !== null && height !== "" && !isNaN(Number(height))) ? Number(height) : null;
+        patient.weight = (weight !== undefined && weight !== null && weight !== "" && !isNaN(Number(weight))) ? Number(weight) : null;
+        patient.bloodGroup = (bloodGroup && ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].includes(bloodGroup)) ? bloodGroup : null;
+        patient.allergies = allergies || null;
+        patient.chronicConditions = chronicConditions || null;
+        patient.currentMedications = currentMedications || null;
+        patient.emergencyContactName = emergencyContactName || null;
+        patient.emergencyContactNumber = emergencyContactNumber || null;
+        patient.address = address || null;
 
         patient.profileCompleted =
             !!patient.age &&
@@ -146,22 +102,21 @@ async function updatePatientProfile(req, res) {
             !!patient.emergencyContactName &&
             !!patient.emergencyContactNumber &&
             !!patient.address;
-        await patient.save()
+
+        await patient.save();
 
         return res.status(200).json({
             message: "Patient profile updated successfully",
             user,
             patient
-        })
+        });
     } catch (error) {
-        console.error("Error updating patient profile:", error)
+        console.error("Error updating patient profile:", error);
         return res.status(500).json({
-            message: "Internal server error"
-        })
+            message: error.message || "Failed to update patient profile."
+        });
     }
 }
-
-
 
 export {
     getPatientProfile,

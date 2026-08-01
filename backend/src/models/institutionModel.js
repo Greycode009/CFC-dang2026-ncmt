@@ -66,6 +66,16 @@ const Institution = sequelize.define(
             type: DataTypes.STRING,
             allowNull: true
         },
+        registrationFee: {
+            type: DataTypes.INTEGER,
+            defaultValue: 500,
+            allowNull: true
+        },
+        availableTimeSlots: {
+            type: DataTypes.TEXT,
+            defaultValue: "09:00 AM, 09:30 AM, 10:00 AM, 10:30 AM, 11:00 AM, 02:00 PM, 02:30 PM, 03:00 PM, 03:30 PM, 04:00 PM",
+            allowNull: true
+        },
         profileCompleted: {
             type: DataTypes.BOOLEAN,
             defaultValue: false

@@ -1,9 +1,6 @@
 import Institution from "../models/institutionModel.js";
 import User from "../models/userModel.js";
 
-
-
-
 async function getAllInstitutions(req, res) {
     try {
         const institutions = await Institution.findAll({
@@ -29,7 +26,6 @@ async function getAllInstitutions(req, res) {
         return res.status(500).json({
             message: "Internal server error."
         });
-
     }
 }
 
@@ -73,17 +69,6 @@ async function verifyInstitution(req, res) {
                 message: "Institution not found."
             });
         }
-        if (!institution.profileCompleted) {
-            return res.status(400).json({
-                message: "Institution profile is incomplete."
-            });
-        }
-
-        if (institution.verificationStatus !== "pending") {
-            return res.status(400).json({
-                message: "Only pending institutions can be verified."
-            });
-        }
 
         institution.verificationStatus = "verified";
 
@@ -107,11 +92,6 @@ async function rejectInstitution(req, res) {
         if (!institution) {
             return res.status(404).json({
                 message: "Institution not found."
-            });
-        }
-        if (institution.verificationStatus !== "pending") {
-            return res.status(400).json({
-                message: "Only pending institutions can be rejected."
             });
         }
 

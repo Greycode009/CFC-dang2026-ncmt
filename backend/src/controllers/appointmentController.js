@@ -2,8 +2,7 @@ import Appointment from "../models/appointmentModel.js";
 import Institution from "../models/institutionModel.js";
 import Patient from "../models/patientModel.js";
 import User from "../models/userModel.js";
-
-
+import { Op } from "sequelize";
 
 async function bookAppointment(req, res) {
     try {
@@ -44,6 +43,24 @@ async function bookAppointment(req, res) {
         if (institution.verificationStatus !== "verified") {
             return res.status(400).json({
                 message: "Institution is not verified."
+            });
+        }
+
+        // Prevent double booking for the same facility, date, and time slot
+        const existingBooking = await Appointment.findOne({
+            where: {
+                institutionId: institution.id,
+                appointmentDate,
+                appointmentTime,
+                status: {
+                    [Op.notIn]: ["cancelled", "rejected"]
+                }
+            }
+        });
+
+        if (existingBooking) {
+            return res.status(400).json({
+                message: `The ${appointmentTime} slot on ${appointmentDate} has already been booked by another patient. Please choose a different slot.`
             });
         }
 
@@ -94,7 +111,8 @@ async function getMyAppointments(req, res) {
                             model: User,
                             attributes: [
                                 "fullName",
-                                "phoneNumber"
+                                "phoneNumber",
+                                "email"
                             ]
                         }
                     ]
@@ -326,6 +344,35 @@ async function completeAppointment(req, res) {
     }
 }
 
+async function getBookedSlots(req, res) {
+    try {
+        const { institutionId, date } = req.query;
+        if (!institutionId || !date) {
+            return res.status(400).json({ message: "institutionId and date are required" });
+        }
+
+        const bookedAppointments = await Appointment.findAll({
+            where: {
+                institutionId,
+                appointmentDate: date,
+                status: {
+                    [Op.notIn]: ["cancelled", "rejected"]
+                }
+            },
+            attributes: ["appointmentTime"]
+        });
+
+        const bookedTimes = bookedAppointments.map(a => a.appointmentTime);
+
+        return res.status(200).json({
+            bookedTimes
+        });
+    } catch (error) {
+        console.error("Error fetching booked slots:", error);
+        return res.status(500).json({ message: "Internal server error." });
+    }
+}
+
 
 export {
     bookAppointment,
@@ -334,5 +381,6 @@ export {
     acceptAppointment,
     rejectAppointment,
     cancelAppointment,
-    completeAppointment
+    completeAppointment,
+    getBookedSlots
 }
