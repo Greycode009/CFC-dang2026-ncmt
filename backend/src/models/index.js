@@ -3,6 +3,7 @@ import User from "./userModel.js";
 import Patient from "./patientModel.js";
 import Institution from "./institutionModel.js";
 import Appointment from "./appointmentModel.js";
+import MedicalRecord from "./medicalRecordModel.js";
 
 
 Patient.belongsTo(User, { foreignKey: "userId" });
@@ -16,3 +17,6 @@ Appointment.belongsTo(Patient, { foreignKey: "patientId"})
 
 Institution.hasMany(Appointment, { foreignKey: "institutionId"})
 Appointment.belongsTo(Institution, { foreignKey: "institutionId"})
+
+Patient.hasMany(MedicalRecord, {foreignKey: "patientId"})
+MedicalRecord.belongsTo(Patient, {foreignKey: "patientId"})
