@@ -10,4 +10,5 @@ export const envConfig = {
     adminPassword: process.env.ADMIN_PASSWORD,
     adminFullName: process.env.ADMIN_FULLNAME,
     adminPhone: process.env.ADMIN_PHONE,
+    geminiApiKey: process.env.GEMINI_API_KEY
 }
