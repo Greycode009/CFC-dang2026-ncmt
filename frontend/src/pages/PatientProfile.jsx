@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaUserCheck, FaHeartbeat, FaNotesMedical, FaPhoneAlt } from "react-icons/fa";
 import Profile from "../components/Profile";
 import PersonalBasics from "../components/PatientProfile/PersonalBasics";

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaPlus, FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -20,14 +20,14 @@ const Login = () => {
   };
 
   return (
-    // Outer Page Background Wrapper (Clean human-written Tailwind)
-    <div className="min-h-screen w-full bg-[#e6f4f1] flex items-center justify-center p-4 sm:p-6 lg:p-12">
+    // Outer Page Background Wrapper (No-scroll viewport height)
+    <div className="min-h-[calc(100vh-70px)] w-full bg-slate-50 flex items-center justify-center p-4 sm:p-6">
       
       {/* Main Centered Login Card Container */}
-      <div className="w-full max-w-5xl bg-white rounded-3xl overflow-hidden flex flex-col lg:flex-row border border-slate-200">
+      <div className="w-full max-w-4xl bg-white rounded-3xl overflow-hidden flex flex-col lg:flex-row border border-slate-200/80 shadow-xl">
         
         {/* LEFT PANEL: Teal Branding Banner */}
-        <div className="lg:w-1/2 bg-[#0d9488] text-white p-8 lg:p-12 flex flex-col justify-center items-center text-center relative overflow-hidden">
+        <div className="lg:w-1/2 bg-[#0d9488] text-white p-6 lg:p-10 flex flex-col justify-center items-center text-center relative overflow-hidden min-h-[260px] lg:min-h-[440px]">
           
           {/* Background Decorative Shapes */}
           <div className="absolute -top-16 -left-16 w-80 h-80 rounded-full border border-white/20 pointer-events-none" />
@@ -36,13 +36,13 @@ const Login = () => {
           <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-white/5 pointer-events-none" />
 
           {/* Branding Content */}
-          <div className="relative z-10 max-w-sm flex flex-col items-center py-6 lg:py-12">
+          <div className="relative z-10 max-w-sm flex flex-col items-center">
             {/* Logo Card */}
-            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-2xl flex items-center justify-center border border-white/30 mb-6">
-              <FaPlus className="text-[#0d9488] text-3xl sm:text-4xl" />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-2xl flex items-center justify-center border border-white/30 mb-5 shadow-sm">
+              <FaPlus className="text-[#0d9488] text-2xl sm:text-3xl" />
             </div>
 
-            <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-3 text-white">
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight mb-2.5 text-white">
               Welcome to Med Assist
             </h1>
             <p className="font-sans text-white/90 text-xs sm:text-sm leading-relaxed max-w-xs">
@@ -52,11 +52,11 @@ const Login = () => {
         </div>
 
         {/* RIGHT PANEL: Login Form */}
-        <div className="lg:w-1/2 flex items-center justify-center p-6 sm:p-10 lg:p-12 bg-white">
-          <div className="w-full max-w-sm space-y-6">
+        <div className="lg:w-1/2 flex items-center justify-center p-6 sm:p-8 lg:p-10 bg-white">
+          <div className="w-full max-w-sm space-y-4">
             
             {/* Form Header */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <h2 className="font-serif text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                 Welcome Back
               </h2>
@@ -66,11 +66,11 @@ const Login = () => {
             </div>
 
             {/* Form Fields */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3.5">
               
               {/* Email Input */}
-              <div className="space-y-1.5">
-                <label htmlFor="email" className="font-sans block text-xs sm:text-sm font-semibold text-slate-800">
+              <div className="space-y-1">
+                <label htmlFor="email" className="font-sans block text-xs font-semibold text-slate-800">
                   Email Address
                 </label>
                 <input
@@ -80,13 +80,13 @@ const Login = () => {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="font-sans w-full px-4 py-2.5 sm:py-3 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] transition"
+                  className="font-sans w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] transition"
                 />
               </div>
 
               {/* Password Input with Show/Hide Toggle */}
-              <div className="space-y-1.5">
-                <label htmlFor="password" className="font-sans block text-xs sm:text-sm font-semibold text-slate-800">
+              <div className="space-y-1">
+                <label htmlFor="password" className="font-sans block text-xs font-semibold text-slate-800">
                   Password
                 </label>
                 <div className="relative">
@@ -97,14 +97,14 @@ const Login = () => {
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="font-sans w-full px-4 py-2.5 sm:py-3 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] transition pr-11"
+                    className="font-sans w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] transition pr-11"
                   />
                   
                   {/* Password Toggle Button */}
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1 cursor-pointer"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? <FaEyeSlash className="w-4 h-4" /> : <FaEye className="w-4 h-4" />}
@@ -114,18 +114,18 @@ const Login = () => {
 
               {/* Remember Me & Forgot Password Options */}
               <div className="flex items-center justify-between pt-1">
-                <label className="flex items-center space-x-2 text-sm text-slate-600 cursor-pointer">
+                <label className="flex items-center space-x-2 text-xs text-slate-600 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded border-slate-300 text-[#0d9488] accent-[#0d9488]"
+                    className="w-3.5 h-3.5 rounded border-slate-300 text-[#0d9488] accent-[#0d9488]"
                   />
-                  <span className="font-sans text-xs sm:text-sm">Remember me</span>
+                  <span className="font-sans">Remember me</span>
                 </label>
                 <Link
                   to="/forgot-password"
-                  className="font-sans text-xs sm:text-sm font-semibold text-[#0d9488] hover:underline"
+                  className="font-sans text-xs font-semibold text-[#0d9488] hover:underline"
                 >
                   Forgot Password?
                 </Link>
@@ -134,7 +134,7 @@ const Login = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="font-sans w-full py-3 px-4 bg-[#0d9488] hover:bg-[#0f896f] text-white font-semibold rounded-lg transition duration-150 ease-in-out text-sm"
+                className="font-sans w-full py-2.5 px-4 bg-[#0d9488] hover:bg-[#0f896f] text-white font-semibold rounded-xl transition duration-150 ease-in-out text-sm shadow-xs cursor-pointer mt-1"
               >
                 Log In
               </button>
@@ -153,7 +153,7 @@ const Login = () => {
             </div>
 
             {/* Navigation to Sign Up */}
-            <div className="font-sans text-center text-xs sm:text-sm text-slate-600">
+            <div className="font-sans text-center text-xs text-slate-600">
               Don't have an account?{" "}
               <Link
                 to="/signup"

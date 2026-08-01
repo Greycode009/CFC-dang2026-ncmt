@@ -19,7 +19,7 @@ const Profile = ({
   cardDescription,
 }) => {
   return (
-    <div className="min-h-screen w-full bg-[#f8faf9] flex flex-col justify-between p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen w-full bg-[#f8faf9] flex flex-col justify-between p-4  sm:p-6 lg:p-8">
       
       {/* 1. TOP HEADER & STEPPER NAVIGATION */}
       <div className="w-full max-w-6xl mx-auto space-y-6 pt-2 pb-4">
@@ -100,7 +100,7 @@ const Profile = ({
       <div className="w-full max-w-5xl bg-white rounded-3xl p-6 sm:p-8 lg:p-10 shadow-sm border border-slate-100 flex flex-col lg:flex-row gap-8 my-auto mx-auto">
         
         {/* LEFT COLUMN: Form Section (60%) */}
-        <div className="w-full lg:w-3/5 flex flex-col justify-between space-y-6">
+        <div className="w-full lg:w-3/5 flex flex-col justify-between space-y-2 ">
           
           {/* Header & Subtitle */}
           <div className="space-y-1.5">
@@ -115,7 +115,7 @@ const Profile = ({
           </div>
 
           {/* Form Content / Inputs */}
-          <div className="space-y-4 py-2">
+          <div className="space-y-2 py-2">
             {children}
           </div>
 

@@ -1,4 +1,4 @@
-import React from "react";
+
 
 const BodyMetrics = ({ formData, handleChange }) => {
   return (
@@ -57,8 +57,11 @@ const BodyMetrics = ({ formData, handleChange }) => {
           <option value="O-positive (O+)">O-positive (O+)</option>
           <option value="O-negative (O-)">O-negative (O-)</option>
           <option value="A-positive (A+)">A-positive (A+)</option>
+          <option value="A-negative (A-)">A-negative (A-)</option>
           <option value="B-positive (B+)">B-positive (B+)</option>
+          <option value="B-negative (B-)">B-negative (B-)</option>
           <option value="AB-positive (AB+)">AB-positive (AB+)</option>
+          <option value="AB-negative (AB-)">AB-negative (AB-)</option>
         </select>
       </div>
     </div>
