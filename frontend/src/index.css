@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .font-serif {
+    font-family: 'Fraunces', Georgia, serif;
+  }
+  .font-sans {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  font-family: 'Inter', system-ui, sans-serif;
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+::selection {
+  background: rgba(13, 148, 136, 0.16);
+}
+
