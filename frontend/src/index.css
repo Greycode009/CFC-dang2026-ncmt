@@ -4,9 +4,11 @@
   .font-serif {
     font-family: 'Fraunces', Georgia, serif;
   }
+
   .font-sans {
     font-family: 'Inter', system-ui, sans-serif;
   }
+
   .font-mono {
     font-family: 'JetBrains Mono', monospace;
   }
@@ -19,7 +21,6 @@
 html {
   font-family: 'Inter', system-ui, sans-serif;
   scroll-behavior: smooth;
-  scrollbar-gutter: stable;
 }
 
 body {
@@ -30,6 +31,91 @@ body {
 }
 
 ::selection {
-  background: rgba(13, 148, 136, 0.16);
+  background: rgba(13, 148, 136, 0.2);
+  color: #0f766e;
 }
 
+/* ==========================================================================
+   Custom Theme Scrollbar (Teal MedAssist Design System)
+   ========================================================================== */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #0d9488 #f1f5f9;
+}
+
+/* Webkit (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0d9488;
+  border-radius: 9999px;
+  border: 2px solid #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0b7a70;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #0f766e;
+}
+
+/* Custom Scrollbar for Dark Background Containers (e.g. Sidebars) */
+.dark-scrollbar,
+.bg-\[\#111827\],
+.bg-slate-900,
+.bg-slate-800 {
+  scrollbar-color: #0d9488 #1e293b;
+}
+
+.dark-scrollbar::-webkit-scrollbar-track,
+.bg-\[\#111827\]::-webkit-scrollbar-track,
+.bg-slate-900::-webkit-scrollbar-track,
+.bg-slate-800::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb,
+.bg-\[\#111827\]::-webkit-scrollbar-thumb,
+.bg-slate-900::-webkit-scrollbar-thumb,
+.bg-slate-800::-webkit-scrollbar-thumb {
+  background: #0d9488;
+  border-color: #1e293b;
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb:hover,
+.bg-\[\#111827\]::-webkit-scrollbar-thumb:hover,
+.bg-slate-900::-webkit-scrollbar-thumb:hover,
+.bg-slate-800::-webkit-scrollbar-thumb:hover {
+  background: #14b8a6;
+}
+
+/* Ultra-thin scrollbar utility class */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(241, 245, 249, 0.5);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #0d9488;
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #0b7a70;
+}

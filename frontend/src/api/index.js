@@ -18,11 +18,11 @@ export * from "./hospitalsApi";
 // 5. Appointments
 export * from "./appointmentsApi";
 
-// 6. Medical Records
-export * from "./medicalRecordsApi";
-
-// 7. Admin
+// 6. Admin
 export * from "./adminApi";
+
+// 7. Symptoms & AI Triage
+export * from "./symptomsApi";
 
 // Axios instance (for custom requests)
 export { default as API } from "./axiosInstance";

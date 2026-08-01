@@ -90,7 +90,7 @@ const InstituteAppointments = ({ appointments, onStatusChange }) => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-slate-50/80 border-b border-slate-200">
-                  <th className="text-left px-5 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Ticket ID</th>
+                  <th className="text-left px-5 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">S.N.</th>
                   <th className="text-left px-5 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Patient Name</th>
                   <th className="text-left px-5 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Department & Doctor</th>
                   <th className="text-left px-5 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Date & Time</th>
@@ -99,7 +99,7 @@ const InstituteAppointments = ({ appointments, onStatusChange }) => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filtered.map((appt) => {
+                {filtered.map((appt, idx) => {
                   const status = appt.status.toLowerCase();
                   let badgeCls = "bg-amber-100 text-amber-800 border-amber-200";
                   if (status === "confirmed") badgeCls = "bg-emerald-100 text-emerald-800 border-emerald-200";
@@ -108,7 +108,7 @@ const InstituteAppointments = ({ appointments, onStatusChange }) => {
 
                   return (
                     <tr key={appt.id} className="hover:bg-slate-50/50 transition">
-                      <td className="px-5 py-4 font-mono font-bold text-xs text-slate-500">{appt.id}</td>
+                      <td className="px-5 py-4 font-bold text-xs text-slate-500">{idx + 1}</td>
                       <td className="px-5 py-4">
                         <p className="font-bold text-slate-900">{appt.patientName}</p>
                         <p className="text-xs text-slate-500">{appt.age} yrs • {appt.gender}</p>

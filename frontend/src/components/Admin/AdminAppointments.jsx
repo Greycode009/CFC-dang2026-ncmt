@@ -138,6 +138,7 @@ const AdminAppointments = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-slate-50/80 border-b border-slate-200">
+                  <th className="text-left px-5 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">S.N.</th>
                   <th className="text-left px-5 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Patient</th>
                   <th className="text-left px-5 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Institution</th>
                   <th className="text-left px-5 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Date & Time</th>
@@ -146,8 +147,9 @@ const AdminAppointments = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filtered.map((appt) => (
+                {filtered.map((appt, idx) => (
                   <tr key={appt.id} className="hover:bg-slate-50/50 transition">
+                    <td className="px-5 py-4 font-bold text-xs text-slate-500">{idx + 1}</td>
                     <td className="px-5 py-4">
                       <div className="flex items-center space-x-3">
                         <div className="w-9 h-9 rounded-full bg-teal-50 text-[#0d9488] flex items-center justify-center flex-shrink-0 border border-teal-100">

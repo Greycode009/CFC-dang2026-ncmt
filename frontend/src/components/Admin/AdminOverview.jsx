@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   FaHospital,
   FaUsers,
-  FaCalendarCheck,
   FaCheckCircle,
   FaClock,
   FaChartLine,
@@ -181,13 +180,6 @@ const AdminOverview = ({ onNavigate }) => {
             >
               <FaHospital className="text-slate-400" />
               <span>View All Institutions</span>
-            </button>
-            <button
-              onClick={() => onNavigate("appointments")}
-              className="w-full flex items-center space-x-3 px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-xl text-sm font-semibold text-slate-700 transition cursor-pointer border border-slate-200/60"
-            >
-              <FaCalendarCheck className="text-slate-400" />
-              <span>View All Appointments</span>
             </button>
           </div>
         </div>

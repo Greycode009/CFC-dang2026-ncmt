@@ -1,7 +1,7 @@
 import React from "react";
-import PatientDashboard from "./PatientDashboard";
-import InstituteDashboard from "./InstituteDashboard";
-import AdminDashboard from "./AdminDashboard";
+import PatientDashboard from "./patient/PatientDashboard";
+import InstituteDashboard from "./institute/InstituteDashboard";
+import AdminDashboard from "./admin/AdminDashboard";
 import { useAuth } from "../context/AuthContext";
 
 const Dashboard = () => {
