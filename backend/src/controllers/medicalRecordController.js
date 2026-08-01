@@ -70,50 +70,6 @@ async function getMyMedicalRecords(req, res) {
     }
 }
 
-async function updateMedicalRecord(req, res) {
-    try {
-        const patient = await Patient.findOne({
-            where: {
-                userId: req.user.id
-            }
-        });
-        const record = await MedicalRecord.findByPk(req.params.id);
-
-        if (!record) {
-            return res.status(404).json({
-                message: "Medical record not found."
-            });
-        }
-
-        if (record.patientId !== patient.id) {
-            return res.status(403).json({
-                message: "Unauthorized."
-            });
-        }
-
-        const { title, recordType, description } = req.body;
-
-        if (title) record.title = title;
-        if (recordType) record.recordType = recordType;
-        if (description) record.description = description;
-
-        await record.save();
-
-        return res.status(200).json({
-            message: "Medical record updated successfully.",
-            record
-        });
-
-    } catch (error) {
-
-        console.error(error);
-
-        return res.status(500).json({
-            message: "Internal server error."
-        });
-    }
-}
-
 async function deleteMedicalRecord(req, res) {
     try {
         const patient = await Patient.findOne({
@@ -150,40 +106,8 @@ async function deleteMedicalRecord(req, res) {
     }
 }
 
-async function getPatientMedicalRecords(req, res) {
-    try {
-        const patient = await Patient.findByPk(req.params.patientId);
-        if (!patient) {
-            return res.status(404).json({
-                message: "Patient not found."
-            });
-        }
-
-        const records = await MedicalRecord.findAll({
-            where: {
-                patientId: patient.id
-            },
-            order: [["createdAt", "DESC"]]
-        });
-
-        return res.status(200).json({
-            records
-        });
-
-    } catch (error) {
-
-        console.error(error);
-
-        return res.status(500).json({
-            message: "Internal server error."
-        });
-    }
-}
-
 export {
     uploadMedicalRecord,
     getMyMedicalRecords,
-    updateMedicalRecord,
     deleteMedicalRecord,
-    getPatientMedicalRecords
 };
