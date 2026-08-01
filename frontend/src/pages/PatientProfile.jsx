@@ -14,18 +14,19 @@ const PatientProfile = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // Mode & Loading States
+  // Mode, Toast & Loading States
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [toast, setToast] = useState(null);
   const [profileData, setProfileData] = useState(null);
 
   // Form State
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    fullName: "Sushit Karki",
-    email: "sushit@gmail.com",
-    phoneNumber: "9801234567",
+    fullName: "",
+    email: "",
+    phoneNumber: "",
     age: "28",
     gender: "Female",
     height: "168",
@@ -34,8 +35,8 @@ const PatientProfile = () => {
     allergies: "None",
     chronicConditions: "None",
     currentMedications: "None",
-    emergencyContactName: "Ram Sharma",
-    emergencyContactNumber: "9801234567",
+    emergencyContactName: "Emergency Contact",
+    emergencyContactNumber: "",
     address: "Nepalgunj, Banke",
   });
 
@@ -50,19 +51,19 @@ const PatientProfile = () => {
           const p = res.patient;
           const u = p.User || {};
           setFormData({
-            fullName: u.fullName || "Sushit Karki",
-            email: u.email || "sushit@gmail.com",
-            phoneNumber: u.phoneNumber || "9801234567",
-            age: p.age || "28",
+            fullName: u.fullName || "",
+            email: u.email || "",
+            phoneNumber: u.phoneNumber || "",
+            age: p.age ? String(p.age) : "28",
             gender: p.gender || "Female",
-            height: p.height || "168",
-            weight: p.weight || "62",
+            height: p.height ? String(p.height) : "168",
+            weight: p.weight ? String(p.weight) : "62",
             bloodGroup: p.bloodGroup || "O+",
             allergies: p.allergies || "None",
             chronicConditions: p.chronicConditions || "None",
             currentMedications: p.currentMedications || "None",
-            emergencyContactName: p.emergencyContactName || "Ram Sharma",
-            emergencyContactNumber: p.emergencyContactNumber || "9801234567",
+            emergencyContactName: p.emergencyContactName || p.emergencyName || "",
+            emergencyContactNumber: p.emergencyContactNumber || p.emergencyPhone || "",
             address: p.address || "Nepalgunj, Banke",
           });
         }
@@ -92,22 +93,23 @@ const PatientProfile = () => {
   // Submit PATCH /api/patients/profile
   const handleSaveProfile = async () => {
     setIsSaving(true);
+    setToast(null);
     try {
       const payload = {
         fullName: formData.fullName,
         email: formData.email,
         phoneNumber: formData.phoneNumber,
         age: parseInt(formData.age) || 28,
-        gender: formData.gender,
+        gender: formData.gender || "Female",
         height: parseFloat(formData.height) || 168,
         weight: parseFloat(formData.weight) || 62,
-        bloodGroup: formData.bloodGroup,
-        allergies: formData.allergies,
-        chronicConditions: formData.chronicConditions,
-        currentMedications: formData.currentMedications,
-        emergencyContactName: formData.emergencyContactName,
-        emergencyContactNumber: formData.emergencyContactNumber,
-        address: formData.address,
+        bloodGroup: formData.bloodGroup || "O+",
+        allergies: formData.allergies || "None",
+        chronicConditions: formData.chronicConditions || "None",
+        currentMedications: formData.currentMedications || "None",
+        emergencyContactName: formData.emergencyContactName || formData.emergencyName || "Emergency Contact",
+        emergencyContactNumber: formData.emergencyContactNumber || formData.emergencyPhone || "9800000000",
+        address: formData.address || "Nepalgunj, Banke",
       };
 
       const updated = await updatePatientProfile(payload);
@@ -123,11 +125,17 @@ const PatientProfile = () => {
       });
 
       login("patient", { name: payload.fullName, email: payload.email });
-      alert(updated?.message || "Patient profile updated successfully!");
-      setIsEditing(false);
-      setCurrentStep(1);
+      setToast({ type: "success", message: updated?.message || "Patient profile updated successfully!" });
+      
+      setTimeout(() => {
+        setIsEditing(false);
+        setCurrentStep(1);
+        navigate("/dashboard");
+      }, 1200);
+
     } catch (err) {
-      alert("Failed to update profile: " + (err.message || "Please check fields."));
+      setToast({ type: "error", message: err.response?.data?.message || err.message || "Failed to update profile." });
+      setTimeout(() => setToast(null), 4000);
     } finally {
       setIsSaving(false);
     }
@@ -222,15 +230,7 @@ const PatientProfile = () => {
 
   return (
     <div className="relative">
-      <div className="bg-teal-700 text-white text-xs px-4 py-2 flex items-center justify-between">
-        <span>Editing Patient Profile — Send PATCH to /api/patients/profile</span>
-        <button
-          onClick={() => setIsEditing(false)}
-          className="underline font-semibold hover:text-teal-200 cursor-pointer"
-        >
-          Cancel Editing
-        </button>
-      </div>
+
 
       <Profile
         steps={steps}
@@ -242,6 +242,8 @@ const PatientProfile = () => {
         onSkip={handleSkip}
         isFirstStep={currentStep === 1}
         isLastStep={currentStep === steps.length}
+        isSaving={isSaving}
+        toast={toast}
         cardIcon={stepConfig.cardIcon}
         cardTitle={stepConfig.cardTitle}
         cardDescription={stepConfig.cardDescription}

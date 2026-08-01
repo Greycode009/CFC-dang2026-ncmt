@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FaPlus, FaCheck, FaQuestionCircle } from "react-icons/fa";
+import { FaPlus, FaCheck, FaQuestionCircle, FaSpinner, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import ProfileCard from "./ProfileCard";
 
 const Profile = ({
@@ -14,13 +14,33 @@ const Profile = ({
   onSkip,
   isFirstStep = false,
   isLastStep = false,
+  isSaving = false,
+  toast = null,
   cardIcon,
   cardTitle,
   cardDescription,
 }) => {
   return (
-    <div className="min-h-screen w-full bg-[#f8faf9] flex flex-col justify-between p-4  sm:p-6 lg:p-8">
+    <div className="min-h-screen w-full bg-[#f8faf9] flex flex-col justify-between p-4 sm:p-6 lg:p-8 relative">
       
+      {/* Toast Notification Overlay */}
+      {toast && (
+        <div
+          className={`fixed top-6 right-6 z-50 px-5 py-3.5 rounded-2xl shadow-xl border flex items-center space-x-3 transition-all duration-300 animate-bounce ${
+            toast.type === "success"
+              ? "bg-emerald-900 text-emerald-100 border-emerald-700"
+              : "bg-rose-900 text-rose-100 border-rose-700"
+          }`}
+        >
+          {toast.type === "success" ? (
+            <FaCheckCircle className="text-emerald-400 text-xl" />
+          ) : (
+            <FaExclamationCircle className="text-rose-400 text-xl" />
+          )}
+          <span className="text-xs sm:text-sm font-semibold">{toast.message}</span>
+        </div>
+      )}
+
       {/* 1. TOP HEADER & STEPPER NAVIGATION */}
       <div className="w-full max-w-6xl mx-auto space-y-6 pt-2 pb-4">
         
@@ -127,8 +147,9 @@ const Profile = ({
               {!isFirstStep && (
                 <button
                   type="button"
+                  disabled={isSaving}
                   onClick={onPrevious}
-                  className="font-sans px-5 py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 transition"
+                  className="font-sans px-5 py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer disabled:opacity-50"
                 >
                   Previous
                 </button>
@@ -139,21 +160,30 @@ const Profile = ({
             {onSkip && (
               <button
                 type="button"
+                disabled={isSaving}
                 onClick={onSkip}
-                className="font-sans text-xs sm:text-sm text-slate-400 hover:text-slate-600 underline underline-offset-4 transition"
+                className="font-sans text-xs sm:text-sm text-slate-400 hover:text-slate-600 underline underline-offset-4 transition cursor-pointer disabled:opacity-50"
               >
                 Skip for now
               </button>
             )}
 
-            {/* Next Step Button */}
+            {/* Next Step / Complete Profile Button */}
             <div>
               <button
                 type="button"
                 onClick={onNext}
-                className="font-sans px-7 py-3 bg-[#0d9488] hover:bg-[#0f896f] text-white font-semibold rounded-xl text-xs sm:text-sm shadow-xs transition duration-150"
+                disabled={isSaving}
+                className="font-sans px-7 py-3 bg-[#0d9488] hover:bg-[#0f896f] disabled:opacity-75 text-white font-semibold rounded-xl text-xs sm:text-sm shadow-xs transition duration-150 flex items-center space-x-2.5 cursor-pointer disabled:cursor-not-allowed min-w-[150px] justify-center"
               >
-                {isLastStep ? "Complete Profile" : "Next Step"}
+                {isSaving ? (
+                  <>
+                    <FaSpinner className="animate-spin text-sm" />
+                    <span>Updating Profile...</span>
+                  </>
+                ) : (
+                  <span>{isLastStep ? "Complete Profile" : "Next Step"}</span>
+                )}
               </button>
             </div>
 

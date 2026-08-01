@@ -1,114 +1,129 @@
-
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
 
-  // Hide Navbar completely on profile pages (e.g. /patient/profile, /institute/profile)
-  if (location.pathname.includes("/profile")) {
-    return null;
-  }
-
-  // Check if current page is Login
+  const isLoggedIn = user?.isLoggedIn;
   const isLoginPage = location.pathname === "/login";
 
+  // Compute initials for user avatar badge (e.g. "Ram Sharma" -> "RS")
+  const getInitials = (name) => {
+    if (!name) return "U";
+    const parts = name.trim().split(" ");
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
+  const profilePath =
+    user?.role === "institution" || user?.role === "institute"
+      ? "/institute/profile"
+      : "/patient/profile";
+
+  const navLinkClass = ({ isActive }) =>
+    isActive
+      ? "text-sm font-semibold text-[#0d9488]"
+      : "text-sm font-medium text-slate-600 hover:text-[#0d9488] transition";
+
   return (
-    <header className="w-full bg-white border-b border-slate-100 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between">
+    <header className="w-full bg-white border-b border-slate-200 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         
         {/* 1. LOGO */}
-        <Link to="/" className="flex items-center space-x-2.5">
-          <div className="w-9 h-9 rounded-xl bg-[#0d9488] text-white flex items-center justify-center shadow-sm">
-            <FaPlus className="text-base" />
+        <Link to="/" className="flex items-center space-x-2.5 group">
+          <div className="w-8 h-8 rounded-lg bg-[#0d9488] text-white flex items-center justify-center shadow-xs">
+            <FaPlus className="text-xs" />
           </div>
-          <span className="text-xl font-bold text-slate-800 tracking-tight">
+          <span className="text-xl font-bold text-slate-900 tracking-tight">
             MedAssist
           </span>
         </Link>
 
-        {/* 2. NAVIGATION LINKS */}
-        <nav className="hidden md:flex items-center space-x-8">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) =>
-              isActive
-                ? "text-sm font-semibold text-[#0d9488]"
-                : "text-sm font-semibold text-slate-700 hover:text-[#0d9488] transition"
-            }
-          >
+        {/* 2. NAVIGATION LINKS — Conditional on auth state */}
+        <nav className="hidden md:flex items-center space-x-7">
+          <NavLink to="/" end className={navLinkClass}>
             Home
           </NavLink>
 
-          <NavLink
-            to="/hospitals"
-            className={({ isActive }) =>
-              isActive
-                ? "text-sm font-semibold text-[#0d9488]"
-                : "text-sm font-semibold text-slate-700 hover:text-[#0d9488] transition"
-            }
-          >
-            Hospitals
-          </NavLink>
+          {isLoggedIn ? (
+            <>
+              {/* Logged-in links */}
+              <NavLink to="/hospitals" className={navLinkClass}>
+                Hospitals
+              </NavLink>
 
-          <NavLink
-            to="/ai-assistant"
-            className={({ isActive }) =>
-              isActive
-                ? "text-sm font-semibold text-[#0d9488]"
-                : "text-sm font-semibold text-slate-700 hover:text-[#0d9488] transition"
-            }
-          >
-            AI Assistant
-          </NavLink>
+              <NavLink to="/appointments" className={navLinkClass}>
+                Appointments
+              </NavLink>
 
-          <NavLink
-            to="/about"
-            className={({ isActive }) =>
-              isActive
-                ? "text-sm font-semibold text-[#0d9488]"
-                : "text-sm font-semibold text-slate-700 hover:text-[#0d9488] transition"
-            }
-          >
-            About
-          </NavLink>
+              <NavLink to="/ai-assistant" className={navLinkClass}>
+                AI Assistant
+              </NavLink>
+            </>
+          ) : (
+            <>
+              {/* Guest links */}
+              <NavLink to="/about" className={navLinkClass}>
+                About Us
+              </NavLink>
 
-          <NavLink
-            to="/health-history"
-            className={({ isActive }) =>
-              isActive
-                ? "text-sm font-semibold text-[#0d9488]"
-                : "text-sm font-semibold text-slate-700 hover:text-[#0d9488] transition"
-            }
-          >
-            Health History
-          </NavLink>
+              <NavLink to="/services" className={navLinkClass}>
+                Services
+              </NavLink>
+
+              <NavLink to="/how-it-works" className={navLinkClass}>
+                How It Works
+              </NavLink>
+
+              <NavLink to="/contact" className={navLinkClass}>
+                Contact Us
+              </NavLink>
+            </>
+          )}
         </nav>
 
-        {/* 3. BUTTONS OR USER INFO */}
-        <div className="flex items-center space-x-3">
-          {user?.isLoggedIn ? (
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2 px-3 py-1.5 bg-slate-100 rounded-full border border-slate-200/80">
-                <span className="w-2 h-2 rounded-full bg-[#0d9488]" />
-                <span className="text-xs font-semibold text-slate-800">{user.name}</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-100 px-2 py-0.5 rounded-full">
-                  {user.role}
+        {/* 3. USER PROFILE OR LOGIN/SIGNUP */}
+        <div className="flex items-center space-x-4">
+          {isLoggedIn ? (
+            <div className="flex items-center space-x-3 text-sm">
+              {/* Clickable Profile Badge & User Name */}
+              <Link
+                to={profilePath}
+                title="Go to Profile"
+                className="flex items-center space-x-2.5 hover:opacity-85 transition cursor-pointer group"
+              >
+                {/* Initials Badge */}
+                <div className="w-8 h-8 rounded-full bg-teal-100 text-[#0d9488] font-bold text-xs flex items-center justify-center border border-teal-200">
+                  {getInitials(user.name)}
+                </div>
+                <span className="font-semibold text-slate-800 group-hover:text-[#0d9488] transition">
+                  {user.name || "User"}
                 </span>
-              </div>
+              </Link>
+
+              {/* Vertical Divider */}
+              <span className="text-slate-300 font-light">|</span>
+
+              {/* Logout Link */}
               <button
-                onClick={logout}
-                className="px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-full transition cursor-pointer border border-slate-200"
+                onClick={handleLogout}
+                className="text-xs font-semibold text-slate-500 hover:text-rose-600 transition cursor-pointer"
               >
                 Logout
               </button>
             </div>
           ) : (
             <>
-              {/* Login Link / Button */}
               <Link
                 to="/login"
                 className={
@@ -119,8 +134,6 @@ const Navbar = () => {
               >
                 Login
               </Link>
-
-              {/* Sign Up Link / Button */}
               <Link
                 to="/signup"
                 className={

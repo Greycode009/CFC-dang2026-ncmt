@@ -1,100 +1,94 @@
-import React, { useState } from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import React from "react";
+import { FaCalendarAlt, FaCheckCircle } from "react-icons/fa";
 
-const CalendarPicker = ({ selectedDate, onSelectDate }) => {
-  // Calendar state for month navigation
-  const [currentMonthIndex, setCurrentMonthIndex] = useState(0); // 0 = Kartik 2080, 1 = Mangsir 2080, etc.
+/**
+ * Generates the array of next 7 available booking days starting from today
+ */
+export function getNext7Days() {
+  const days = [];
+  const today = new Date();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const dayName = d.toLocaleDateString("en-US", { weekday: "short" });
+    const monthName = d.toLocaleDateString("en-US", { month: "short" });
+    const fullMonthName = d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    const dateNum = d.getDate();
+    const year = d.getFullYear();
+    const monthIndex = d.getMonth() + 1;
+    const fullDate = `${year}-${String(monthIndex).padStart(2, "0")}-${String(dateNum).padStart(2, "0")}`;
 
-  const months = [
-    { name: "Kartik 2080", daysCount: 30, startOffset: 3 }, // starts on Wed (3)
-    { name: "Mangsir 2080", daysCount: 29, startOffset: 5 },
-    { name: "Poush 2080", daysCount: 30, startOffset: 0 },
-  ];
+    days.push({
+      dateObj: d,
+      dayName,
+      monthName,
+      fullMonthName,
+      dateNum,
+      year,
+      fullDate,
+      formattedLabel: `${dayName}, ${monthName} ${dateNum}`,
+      isToday: i === 0,
+      isTomorrow: i === 1,
+    });
+  }
+  return days;
+}
 
-  const activeMonth = months[currentMonthIndex];
-
-  const handlePrevMonth = () => {
-    if (currentMonthIndex > 0) {
-      setCurrentMonthIndex(currentMonthIndex - 1);
-    }
-  };
-
-  const handleNextMonth = () => {
-    if (currentMonthIndex < months.length - 1) {
-      setCurrentMonthIndex(currentMonthIndex + 1);
-    }
-  };
-
-  // Generate calendar grid days array
-  const prevMonthOverflowDays = Array.from({ length: activeMonth.startOffset }, (_, i) => 28 + i);
-  const currentMonthDays = Array.from({ length: activeMonth.daysCount }, (_, i) => i + 1);
+const CalendarPicker = ({ selectedFullDate, onSelectDateObj }) => {
+  const availableDays = getNext7Days();
+  const currentMonthYear = availableDays[0]?.fullMonthName || "";
 
   return (
     <div className="space-y-4">
-      {/* Calendar Header with Month Navigation */}
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="font-bold text-slate-900 text-sm">{activeMonth.name}</h3>
-        <div className="flex items-center space-x-1 text-slate-400">
-          <button
-            onClick={handlePrevMonth}
-            disabled={currentMonthIndex === 0}
-            className="p-1 hover:text-slate-700 disabled:opacity-30 transition cursor-pointer"
-            title="Previous Month"
-          >
-            <FaChevronLeft className="text-xs" />
-          </button>
-          <button
-            onClick={handleNextMonth}
-            disabled={currentMonthIndex === months.length - 1}
-            className="p-1 hover:text-slate-700 disabled:opacity-30 transition cursor-pointer"
-            title="Next Month"
-          >
-            <FaChevronRight className="text-xs" />
-          </button>
+        <div className="flex items-center space-x-2">
+          <FaCalendarAlt className="text-[#0d9488] text-xs" />
+          <h3 className="font-bold text-slate-900 text-sm">{currentMonthYear}</h3>
         </div>
+        <span className="px-2.5 py-0.5 bg-teal-50 text-[#0d9488] border border-teal-200/60 rounded-full text-[11px] font-extrabold">
+          Next 7 Days Only
+        </span>
       </div>
 
-      {/* Mini Calendar Grid */}
-      <div className="text-center text-xs">
-        {/* Days of week header */}
-        <div className="grid grid-cols-7 gap-1 font-bold text-slate-400 text-[11px] mb-2">
-          <span>S</span>
-          <span>M</span>
-          <span>T</span>
-          <span>W</span>
-          <span>T</span>
-          <span>F</span>
-          <span>S</span>
-        </div>
-
-        {/* Date numbers grid */}
-        <div className="grid grid-cols-7 gap-1 text-slate-700 font-medium text-xs">
-          {/* Previous month overflow days (disabled look) */}
-          {prevMonthOverflowDays.map((dayNum, idx) => (
-            <span key={`prev-${idx}`} className="p-1.5 text-slate-300 pointer-events-none">
-              {dayNum}
-            </span>
-          ))}
-
-          {/* Active month days */}
-          {currentMonthDays.map((dayNum) => {
-            const isSelected = selectedDate === dayNum;
-            return (
-              <button
-                key={dayNum}
-                onClick={() => onSelectDate(dayNum, activeMonth.name)}
-                className={`py-1.5 rounded-lg font-bold transition cursor-pointer text-center ${
-                  isSelected
-                    ? "bg-[#0d9488] text-white shadow-xs"
-                    : "hover:bg-teal-50 text-slate-700 hover:text-[#0d9488]"
-                }`}
-              >
-                {dayNum}
-              </button>
-            );
-          })}
-        </div>
+      {/* 7 Days Quick Selector Grid */}
+      <div className="grid grid-cols-7 gap-1.5">
+        {availableDays.map((day) => {
+          const isSelected = selectedFullDate === day.fullDate;
+          return (
+            <button
+              key={day.fullDate}
+              type="button"
+              onClick={() => onSelectDateObj(day)}
+              className={`p-2 rounded-2xl flex flex-col items-center justify-center transition-all cursor-pointer border ${
+                isSelected
+                  ? "bg-[#0d9488] text-white border-[#0d9488] shadow-md shadow-teal-500/15 scale-105"
+                  : "bg-slate-50 hover:bg-teal-50/60 text-slate-700 border-slate-200/80 hover:border-teal-200"
+              }`}
+            >
+              <span className={`text-[10px] font-extrabold uppercase tracking-wider ${
+                isSelected ? "text-teal-100" : "text-slate-400"
+              }`}>
+                {day.dayName}
+              </span>
+              <span className="text-base font-black my-0.5">
+                {day.dateNum}
+              </span>
+              <span className={`text-[9px] font-bold ${
+                isSelected ? "text-teal-100" : "text-slate-500"
+              }`}>
+                {day.isToday ? "Today" : day.isTomorrow ? "Tomorrow" : day.monthName}
+              </span>
+            </button>
+          );
+        })}
       </div>
+
+      {/* Helper Footer Note */}
+      <p className="text-[11px] text-slate-500 flex items-center space-x-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+        <FaCheckCircle className="text-[#0d9488] text-xs flex-shrink-0" />
+        <span>Appointments can be booked up to 7 days in advance.</span>
+      </p>
     </div>
   );
 };

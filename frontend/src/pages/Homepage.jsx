@@ -1,6 +1,4 @@
 import Hero from "../components/Homepage/Hero";
-import EverythingYouNeed from "../components/Homepage/EverythingYouNeed";
-import HowItWorks from "../components/Homepage/HowItWorks";
 import Testimonials from "../components/Homepage/Testimonials";
 import FAQ from "../components/Homepage/FAQ";
 import CTA from "../components/Homepage/CTA";
@@ -11,8 +9,6 @@ const Homepage = () => {
     <>
       <div className="min-h-screen">
         <Hero />
-        <EverythingYouNeed />
-        <HowItWorks />
         <Testimonials />
         <FAQ />
         <CTA />

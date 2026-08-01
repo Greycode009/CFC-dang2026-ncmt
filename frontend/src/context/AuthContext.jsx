@@ -1,60 +1,41 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
+import { logoutUser } from "../api/authApi";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem("medassist_user");
-    if (savedUser) {
-      try {
-        return JSON.parse(savedUser);
-      } catch (e) {
-        console.error("Failed to parse saved user", e);
-      }
-    }
-    return {
-      name: "Alex Morgan",
-      email: "alex@example.com",
-      role: "patient", // "patient" or "institute"
-      isLoggedIn: true,
-    };
-  });
+  // Pure React memory state — no mock data or user objects in localStorage
+  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem("medassist_user", JSON.stringify(user));
+  const login = (roleOrUser = "patient", userData = {}) => {
+    let userObj = {};
+    if (typeof roleOrUser === "object" && roleOrUser !== null) {
+      userObj = {
+        ...roleOrUser,
+        isLoggedIn: true,
+      };
     } else {
-      localStorage.removeItem("medassist_user");
+      userObj = {
+        role: roleOrUser,
+        isLoggedIn: true,
+        ...userData,
+      };
     }
-  }, [user]);
-
-  const login = (role = "patient", userData = {}) => {
-    const newUser = {
-      name: userData.name || (role === "institute" ? "City Central Hospital" : "Alex Morgan"),
-      email: userData.email || (role === "institute" ? "contact@citycentral.org" : "alex@example.com"),
-      role: role,
-      isLoggedIn: true,
-      ...userData,
-    };
-    setUser(newUser);
-    localStorage.setItem("medassist_user", JSON.stringify(newUser));
+    setUser(userObj);
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("medassist_user");
+    logoutUser();
   };
 
   const switchRole = (newRole) => {
     setUser((prev) => {
-      const updated = {
+      if (!prev) return null;
+      return {
         ...prev,
         role: newRole,
-        name: newRole === "institute" ? "City Central Hospital" : "Alex Morgan",
-        email: newRole === "institute" ? "contact@citycentral.org" : "alex@example.com",
       };
-      localStorage.setItem("medassist_user", JSON.stringify(updated));
-      return updated;
     });
   };
 
@@ -68,9 +49,8 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    // Fallback if context is not wrapped yet
     return {
-      user: { role: localStorage.getItem("userRole") || "patient", name: "Alex Morgan" },
+      user: null,
       login: () => {},
       logout: () => {},
       switchRole: () => {},
