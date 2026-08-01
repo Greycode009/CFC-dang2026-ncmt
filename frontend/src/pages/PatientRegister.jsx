@@ -1,6 +1,7 @@
-import  { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserPlus, FaEye, FaEyeSlash } from "react-icons/fa";
+import { registerUser } from "../api";
 
 const PatientRegister = () => {
   const navigate = useNavigate();
@@ -28,18 +29,28 @@ const PatientRegister = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
 
-    // TODO: Connect with backend API here (e.g., await axios.post('/api/register', formData))
-    console.log("Registering Patient:", formData);
+    const payload = {
+      fullName: formData.fullName,
+      email: formData.email,
+      phoneNumber: formData.phone,
+      password: formData.password,
+      confirmPassword: formData.confirmPassword,
+      role: "patient",
+    };
 
-    // Navigate to patient profile onboarding
-    navigate("/patient/profile");
+    try {
+      await registerUser(payload);
+      navigate("/patient/profile");
+    } catch (err) {
+      alert("Registration failed: " + (err.response?.data?.message || err.message || "Please try again."));
+    }
   };
 
   return (

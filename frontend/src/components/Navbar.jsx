@@ -1,10 +1,11 @@
-import React from "react";
+
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
-  // Get current page location/URL path
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   // Hide Navbar completely on profile pages (e.g. /patient/profile, /institute/profile)
   if (location.pathname.includes("/profile")) {
@@ -32,6 +33,7 @@ const Navbar = () => {
         <nav className="hidden md:flex items-center space-x-8">
           <NavLink
             to="/"
+            end
             className={({ isActive }) =>
               isActive
                 ? "text-sm font-semibold text-[#0d9488]"
@@ -86,33 +88,51 @@ const Navbar = () => {
           </NavLink>
         </nav>
 
-        {/* 3. BUTTONS (Login & Sign Up) */}
+        {/* 3. BUTTONS OR USER INFO */}
         <div className="flex items-center space-x-3">
-          
-          {/* Login Link / Button */}
-          <Link
-            to="/login"
-            className={
-              isLoginPage
-                ? "px-5 py-2 text-sm font-semibold text-white bg-[#0d9488] rounded-full hover:bg-[#0f896f] transition"
-                : "px-4 py-2 text-sm font-semibold text-slate-700 hover:text-[#0d9488] transition"
-            }
-          >
-            Login
-          </Link>
+          {user?.isLoggedIn ? (
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 px-3 py-1.5 bg-slate-100 rounded-full border border-slate-200/80">
+                <span className="w-2 h-2 rounded-full bg-[#0d9488]" />
+                <span className="text-xs font-semibold text-slate-800">{user.name}</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-100 px-2 py-0.5 rounded-full">
+                  {user.role}
+                </span>
+              </div>
+              <button
+                onClick={logout}
+                className="px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-full transition cursor-pointer border border-slate-200"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Login Link / Button */}
+              <Link
+                to="/login"
+                className={
+                  isLoginPage
+                    ? "px-5 py-2 text-sm font-semibold text-white bg-[#0d9488] rounded-full hover:bg-[#0f896f] transition"
+                    : "px-4 py-2 text-sm font-semibold text-slate-700 hover:text-[#0d9488] transition"
+                }
+              >
+                Login
+              </Link>
 
-          {/* Sign Up Link / Button */}
-          <Link
-            to="/signup"
-            className={
-              isLoginPage
-                ? "px-4 py-2 text-sm font-semibold text-slate-700 hover:text-[#0d9488] transition"
-                : "px-5 py-2 text-sm font-semibold text-white bg-[#0d9488] rounded-full hover:bg-[#0f896f] transition"
-            }
-          >
-            Sign Up
-          </Link>
-
+              {/* Sign Up Link / Button */}
+              <Link
+                to="/signup"
+                className={
+                  isLoginPage
+                    ? "px-4 py-2 text-sm font-semibold text-slate-700 hover:text-[#0d9488] transition"
+                    : "px-5 py-2 text-sm font-semibold text-white bg-[#0d9488] rounded-full hover:bg-[#0f896f] transition"
+                }
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
 
       </div>

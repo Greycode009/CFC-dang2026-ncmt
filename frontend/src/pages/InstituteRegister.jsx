@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaPlus, FaEye, FaEyeSlash } from "react-icons/fa";
+import { registerUser } from "../api";
 
 const InstituteRegister = () => {
   const navigate = useNavigate();
@@ -28,18 +29,28 @@ const InstituteRegister = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
 
-    // TODO: Connect with backend API here (e.g., await axios.post('/api/institute/register', formData))
-    console.log("Registering Institute:", formData);
+    const payload = {
+      fullName: formData.instituteName,
+      email: formData.officialEmail,
+      phoneNumber: formData.phoneNumber,
+      password: formData.password,
+      confirmPassword: formData.confirmPassword,
+      role: "institution", // api.md: must be "patient" | "institution"
+    };
 
-    // Navigate to institute profile
-    navigate("/institute/profile");
+    try {
+      await registerUser(payload);
+      navigate("/institute/profile");
+    } catch (err) {
+      alert("Registration failed: " + (err.response?.data?.message || err.message || "Please try again."));
+    }
   };
 
   return (

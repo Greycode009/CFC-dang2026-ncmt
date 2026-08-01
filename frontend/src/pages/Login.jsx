@@ -1,22 +1,42 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaPlus, FaEye, FaEyeSlash } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
+import { loginUser } from "../api";
 
 const Login = () => {
-  // 1. State for form input values
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  // 2. State for toggle options
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // 3. Handle Form Submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Email:", email);
-    console.log("Password:", password);
-    console.log("Remember Me:", rememberMe);
+    setError("");
+    setLoading(true);
+    try {
+      // API returns: { message, token, user: { id, fullName, email, phoneNumber, role, profileCompleted } }
+      const res = await loginUser({ email, password });
+      const user = res.user;
+      login(user.role, {
+        id: user.id,
+        name: user.fullName,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        role: user.role,
+        profileCompleted: user.profileCompleted,
+      });
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid email or password.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -66,7 +86,14 @@ const Login = () => {
             </div>
 
             {/* Form Fields */}
-            <form onSubmit={handleSubmit} className="space-y-3.5">
+            <form onSubmit={handleSubmit} className="space-y-3.5 pt-2">
+
+              {/* API Error Message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-xl px-4 py-3">
+                  {error}
+                </div>
+              )}
               
               {/* Email Input */}
               <div className="space-y-1">
@@ -79,7 +106,7 @@ const Login = () => {
                   required
                   placeholder="Enter your email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); setError(""); }}
                   className="font-sans w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] transition"
                 />
               </div>
@@ -96,11 +123,9 @@ const Login = () => {
                     required
                     placeholder="Enter your password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => { setPassword(e.target.value); setError(""); }}
                     className="font-sans w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] transition pr-11"
                   />
-                  
-                  {/* Password Toggle Button */}
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
@@ -112,7 +137,7 @@ const Login = () => {
                 </div>
               </div>
 
-              {/* Remember Me & Forgot Password Options */}
+              {/* Remember Me & Forgot Password */}
               <div className="flex items-center justify-between pt-1">
                 <label className="flex items-center space-x-2 text-xs text-slate-600 cursor-pointer">
                   <input
@@ -123,10 +148,7 @@ const Login = () => {
                   />
                   <span className="font-sans">Remember me</span>
                 </label>
-                <Link
-                  to="/forgot-password"
-                  className="font-sans text-xs font-semibold text-[#0d9488] hover:underline"
-                >
+                <Link to="/forgot-password" className="font-sans text-xs font-semibold text-[#0d9488] hover:underline">
                   Forgot Password?
                 </Link>
               </div>
@@ -134,9 +156,10 @@ const Login = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="font-sans w-full py-2.5 px-4 bg-[#0d9488] hover:bg-[#0f896f] text-white font-semibold rounded-xl transition duration-150 ease-in-out text-sm shadow-xs cursor-pointer mt-1"
+                disabled={loading}
+                className="font-sans w-full py-2.5 px-4 bg-[#0d9488] hover:bg-[#0f896f] disabled:opacity-60 text-white font-semibold rounded-xl transition text-sm shadow-xs cursor-pointer mt-1"
               >
-                Log In
+                {loading ? "Logging in..." : "Log In"}
               </button>
             </form>
 
@@ -172,6 +195,3 @@ const Login = () => {
 };
 
 export default Login;
-
-
-

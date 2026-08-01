@@ -12,15 +12,20 @@ import InstituteRegister from "./pages/InstituteRegister";
 import PatientProfile from "./pages/PatientProfile";
 import InstituteProfile from "./pages/InstituteProfile";
 import HealthHistory from "./pages/HealthHistory";
+import Dashboard from "./pages/Dashboard";
+import { useAuth } from "./context/AuthContext";
 
 const App = () => {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen flex flex-col justify-between">
       <div>
         <Navbar />
         <main>
           <Routes>
-            <Route path="/" element={<Homepage />} />
+            <Route path="/" element={user?.isLoggedIn ? <Dashboard /> : <Homepage />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/hospitals" element={<Hospitals />} />
             <Route path="/ai-assistant" element={<AIAssistant />} />
             <Route path="/about" element={<About />} />
