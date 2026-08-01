@@ -35,6 +35,9 @@ async function getVerifiedHospitals(req, res) {
 async function searchHospitals(req, res) {
     try {
         const { district, municipality, department, services } = req.query;
+        const where = {
+            verificationStatus: "verified"
+        };
         if (district) {
             where.district = district;
         }

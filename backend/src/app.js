@@ -6,9 +6,15 @@ import adminRoute from "./routes/adminRoutes.js"
 import hospitalRoute from "./routes/hospitalRoutes.js"
 import path from "path";
 import medicalRecordRoute from "./routes/medicalRecordRoutes.js"
+import appointmentRoute from "./routes/appointmentRoutes.js"
+import cors from "cors"
 
 const app = express()
 
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -24,5 +30,6 @@ app.use("/api/institutions", institutionRoute)
 app.use("/api/admin", adminRoute)
 app.use("/api/hospitals", hospitalRoute);
 app.use("/api/medical-records", medicalRecordRoute);
+app.use("/api/appointments", appointmentRoute)
 
 export default app

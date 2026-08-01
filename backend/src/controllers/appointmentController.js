@@ -1,7 +1,7 @@
-import Appointment from "../models/appointmentModel";
-import Institution from "../models/institutionModel";
-import Patient from "../models/patientModel";
-import User from "../models/userModel";
+import Appointment from "../models/appointmentModel.js";
+import Institution from "../models/institutionModel.js";
+import Patient from "../models/patientModel.js";
+import User from "../models/userModel.js";
 
 
 
