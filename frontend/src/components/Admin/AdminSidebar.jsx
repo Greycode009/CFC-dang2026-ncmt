@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import {
   FaTachometerAlt,
   FaHospital,
-  FaCalendarCheck,
-  FaCog,
   FaSignOutAlt,
   FaPlus,
   FaBars,
@@ -15,8 +13,6 @@ import { useNavigate } from "react-router-dom";
 const sidebarLinks = [
   { id: "overview", label: "Overview", icon: FaTachometerAlt },
   { id: "institutions", label: "Institutions", icon: FaHospital },
-  { id: "appointments", label: "Appointments", icon: FaCalendarCheck },
-  { id: "settings", label: "Settings", icon: FaCog },
 ];
 
 const AdminSidebar = ({ activeSection, onChangeSection }) => {

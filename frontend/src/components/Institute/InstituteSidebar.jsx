@@ -8,7 +8,6 @@ import {
   FaPlus,
   FaBars,
   FaTimes,
-  FaHospital,
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -20,10 +19,14 @@ const sidebarLinks = [
   { id: "settings", label: "Operational Settings", icon: FaCog },
 ];
 
-const InstituteSidebar = ({ activeSection, onChangeSection }) => {
+const InstituteSidebar = ({ activeSection, onChangeSection, profileData }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const instUser = profileData?.institution?.User || {};
+  const displayName = instUser.fullName || user?.name || "Hospital Partner";
+  const displayEmail = instUser.email || user?.email || "hospital@medassist.com.np";
 
   const handleLogout = () => {
     logout();
@@ -86,11 +89,11 @@ const InstituteSidebar = ({ activeSection, onChangeSection }) => {
       <div className="px-4 py-5 border-t border-slate-700/50 space-y-3">
         <div className="flex items-center space-x-3 px-3">
           <div className="w-9 h-9 rounded-full bg-teal-900/60 text-teal-300 font-bold text-xs flex items-center justify-center border border-teal-700/40">
-            {getInitials(user?.name)}
+            {getInitials(displayName)}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-white truncate">{user?.name || "Bheri Hospital"}</p>
-            <p className="text-[11px] text-slate-500 truncate">{user?.email || "hospital@medassist.com"}</p>
+            <p className="text-sm font-semibold text-white truncate">{displayName}</p>
+            <p className="text-[11px] text-slate-500 truncate">{displayEmail}</p>
           </div>
         </div>
         <button

@@ -57,3 +57,11 @@ export const completeAppointment = async (id) => {
   const res = await API.patch(`/appointments/${id}/complete`);
   return res.data; // { message, appointment }
 };
+
+// 5.8 Fetch booked slots for facility and date
+export const fetchBookedSlots = async (institutionId, date) => {
+  const res = await API.get("/appointments/booked-slots", {
+    params: { institutionId, date }
+  });
+  return res.data; // { bookedTimes: ["08:00 AM", ...] }
+};
